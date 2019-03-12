@@ -15,4 +15,4 @@ jobs:
   pool:
     vmImage: macOS 10.13
   steps:
-  - template: build/azure-pipelines/continous-build-oni.yml
+  - template: build/azure-pipelines/continuous-build-oni.yml
