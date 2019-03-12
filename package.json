@@ -50,7 +50,6 @@
     "vscode-jsonrpc": "4.0.0",
     "vscode-nsfw": "1.1.1",
     "vscode-proxy-agent": "0.4.0",
-    "vscode-ripgrep": "^1.2.5",
     "vscode-sqlite3": "4.0.7",
     "vscode-textmate": "^4.0.1",
     "vscode-xterm": "3.13.0-beta1",

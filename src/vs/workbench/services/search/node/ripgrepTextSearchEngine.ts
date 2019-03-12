@@ -11,7 +11,9 @@ import { createRegExp, startsWith, startsWithUTF8BOM, stripUTF8BOM, escapeRegExp
 import { URI } from 'vs/base/common/uri';
 import { IExtendedExtensionSearchOptions, SearchError, SearchErrorCode, serializeSearchError } from 'vs/workbench/services/search/common/search';
 import * as vscode from 'vscode';
-import { rgPath } from 'vscode-ripgrep';
+// TODO: Oni - do we need to bring this back for the extension host?
+// import { rgPath } from 'vscode-ripgrep';
+const rgPath = "stub-path";
 import { anchorGlob, createTextSearchResult, IOutputChannel, Maybe, Range } from './ripgrepSearchUtils';
 import { coalesce } from 'vs/base/common/arrays';
 import { splitGlobAware } from 'vs/base/common/glob';

@@ -1,3 +1,3 @@
-test("fail", () => {
-    expect(1).toBe(0);
+test("doesn't fail", () => {
+    expect(1).toBe(1);
 });
