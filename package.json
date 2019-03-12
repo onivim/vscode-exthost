@@ -9,6 +9,7 @@
   "private": true,
   "scripts": {
     "test": "mocha",
+    "test:oni": "jest __tests__",
     "preinstall": "node build/npm/preinstall.js",
     "postinstall": "node build/npm/postinstall.js",
     "compile": "gulp compile --max_old_space_size=4095",
@@ -46,6 +47,7 @@
     "v8-inspect-profiler": "^0.0.20",
     "vscode-chokidar": "1.6.5",
     "vscode-debugprotocol": "1.34.0",
+    "vscode-jsonrpc": "4.0.0",
     "vscode-nsfw": "1.1.1",
     "vscode-proxy-agent": "0.4.0",
     "vscode-ripgrep": "^1.2.5",
