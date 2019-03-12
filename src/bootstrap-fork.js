@@ -16,10 +16,13 @@ if (!!process.send && process.env.PIPE_LOGGING === 'true') {
 	pipeLoggingToParent();
 }
 
+// Oni: We use stdio as the transport, so we need to disable
+// the disabling of STDIO
+
 // Disable IO if configured
-if (!process.env['VSCODE_ALLOW_IO']) {
-	disableSTDIO();
-}
+// if (!process.env['VSCODE_ALLOW_IO']) {
+// 	disableSTDIO();
+// }
 
 // Handle Exceptions
 if (!process.env['VSCODE_HANDLES_UNCAUGHT_ERRORS']) {
