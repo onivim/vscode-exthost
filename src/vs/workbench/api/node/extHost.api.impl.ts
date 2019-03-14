@@ -229,8 +229,8 @@ export function createApiFactory(
 
 		// namespace: env
 		const env: typeof vscode.env = Object.freeze({
-			get machineId() { return initData.telemetryInfo.machineId; },
-			get sessionId() { return initData.telemetryInfo.sessionId; },
+			get machineId() { return null; },
+			get sessionId() { return null; },
 			get language() { return platform.language!; },
 			get appName() { return product.nameLong; },
 			get appRoot() { return initData.environment.appRoot!.fsPath; },

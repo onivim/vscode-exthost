@@ -10,7 +10,7 @@ import { Counter } from 'vs/base/common/numbers';
 import { URI, setUriThrowOnMissingScheme } from 'vs/base/common/uri';
 import { IURITransformer } from 'vs/base/common/uriIpc';
 import { IMessagePassingProtocol } from 'vs/base/parts/ipc/node/ipc';
-import { IEnvironment, IInitData, MainContext, MainThreadConsoleShape } from 'vs/workbench/api/node/extHost.protocol';
+import { IRawEnvironment, IEnvironment, IRawExtensionDescription, IRawInitData, IInitData, MainContext, MainThreadConsoleShape } from 'vs/workbench/api/node/extHost.protocol';
 import { ExtHostConfiguration } from 'vs/workbench/api/node/extHostConfiguration';
 import { ExtHostExtensionService } from 'vs/workbench/api/node/extHostExtensionService';
 import { ExtHostLogService } from 'vs/workbench/api/node/extHostLogService';
@@ -54,13 +54,13 @@ export class ExtensionHostMain {
 
 	private _searchRequestIdProvider: Counter;
 
-	constructor(protocol: IMessagePassingProtocol, initData: IInitData) {
+	constructor(protocol: IMessagePassingProtocol, rawInitData: IRawInitData) {
 		this._isTerminating = false;
 		const uriTransformer: IURITransformer | null = null;
 		const rpcProtocol = new RPCProtocol(protocol, null, uriTransformer);
 
 		// ensure URIs are transformed and revived
-		initData = this.transform(initData, rpcProtocol);
+		const initData = this.transform(rawInitData);
 		this._environment = initData.environment;
 
 		const allowExit = !!this._environment.extensionTestsLocationURI; // to support other test frameworks like Jasmin that use process.exit (https://github.com/Microsoft/vscode/issues/37708)
@@ -148,15 +148,42 @@ export class ExtensionHostMain {
 		}, 1000);
 	}
 
-	private transform(initData: IInitData, rpcProtocol: RPCProtocol): IInitData {
-		initData.extensions.forEach((ext) => (<any>ext).extensionLocation = URI.revive(rpcProtocol.transformIncomingURIs(ext.extensionLocation)));
-		initData.environment.appRoot = URI.revive(rpcProtocol.transformIncomingURIs(initData.environment.appRoot));
-		initData.environment.appSettingsHome = URI.revive(rpcProtocol.transformIncomingURIs(initData.environment.appSettingsHome));
-		initData.environment.extensionDevelopmentLocationURI = URI.revive(rpcProtocol.transformIncomingURIs(initData.environment.extensionDevelopmentLocationURI));
-		initData.environment.extensionTestsLocationURI = URI.revive(rpcProtocol.transformIncomingURIs(initData.environment.extensionTestsLocationURI));
-		initData.environment.globalStorageHome = URI.revive(rpcProtocol.transformIncomingURIs(initData.environment.globalStorageHome));
-		initData.logsLocation = URI.revive(rpcProtocol.transformIncomingURIs(initData.logsLocation));
-		initData.workspace = rpcProtocol.transformIncomingURIs(initData.workspace);
+	private transform(rawInitData: IRawInitData): IInitData {
+		let uriOrNull = (v: string | null) => {
+			if (v) {
+				return URI.file(v);
+			} else {
+				return null;
+			}
+		}
+
+		let refineExtensions = (rawExtensionInfo: IRawExtensionDescription) => {
+			return <IExtensionDescription>{
+				...rawExtensionInfo,
+				extensionLocation: uriOrNull(rawExtensionInfo.extensionLocationPath)
+			}
+		};
+
+		let refineEnvironment = (rawEnvironment: IRawEnvironment) => {
+			return <IEnvironment>{
+				...rawEnvironment,
+				appRoot: uriOrNull(rawEnvironment.appRootPath),
+				appSettingsHome: uriOrNull(rawEnvironment.appSettingsHomePath),
+				extensionDevelopmentLocationURI: uriOrNull(rawEnvironment.extensionDevelopmentLocationPath),
+				extensionTestsLocationURI: uriOrNull(rawEnvironment.extensionTestsLocationPath),
+				globalStorageHome: uriOrNull(rawEnvironment.globalStorageHome),
+			}
+		}
+
+		let initData: IInitData = {
+			...rawInitData,
+			extensions: rawInitData.extensions.map(refineExtensions),
+			environment: refineEnvironment(rawInitData.environment),
+			logsLocation: uriOrNull(rawInitData.logsLocationPath),
+			resolvedExtensions: [],
+			hostExtensions: [],
+			// workspace: uriOrNull(rawInitData.workspacePath),
+		}
 		return initData;
 	}
 }

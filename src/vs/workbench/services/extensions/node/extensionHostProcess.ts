@@ -3,16 +3,17 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import * as nativeWatchdog from 'native-watchdog';
-import { createConnection } from 'net';
+// import * as nativeWatchdog from 'native-watchdog';
+import { Emitter } from 'vs/base/common/event';
 import { onUnexpectedError } from 'vs/base/common/errors';
 import { Event } from 'vs/base/common/event';
-import { IMessagePassingProtocol } from 'vs/base/parts/ipc/node/ipc';
-import { Protocol } from 'vs/base/parts/ipc/node/ipc.net';
-import product from 'vs/platform/product/node/product';
-import { IInitData } from 'vs/workbench/api/node/extHost.protocol';
-import { MessageType, createMessageOfType, isMessageOfType } from 'vs/workbench/services/extensions/node/extensionHostProtocol';
+// import { IMessagePassingProtocol  } from 'vs/base/parts/ipc/node/ipc';
+// import { Protocol } from 'vs/base/parts/ipc/node/ipc.net';
+// import product from 'vs/platform/product/node/product';
+import { IRawInitData } from 'vs/workbench/api/node/extHost.protocol';
+import { IExtensionHostProtocol, isMessageOfType, IncomingMessageType, createMessageOfType, OutgoingMessageType, OutgoingMessage, IncomingMessage } from 'vs/workbench/services/extensions/node/extensionHostProtocol';
 import { exit, ExtensionHostMain } from 'vs/workbench/services/extensions/node/extensionHostMain';
+import * as rpc from "vscode-jsonrpc";
 
 // With Electron 2.x and node.js 8.x the "natives" module
 // can cause a native crash (see https://github.com/nodejs/node/issues/19891 and
@@ -33,8 +34,36 @@ import { exit, ExtensionHostMain } from 'vs/workbench/services/extensions/node/e
 })();
 
 interface IRendererConnection {
-	protocol: IMessagePassingProtocol;
-	initData: IInitData;
+	protocol: IExtensionHostProtocol;
+	initData: IRawInitData;
+}
+
+export class JsonRpcProtocol implements IExtensionHostProtocol {
+
+	private _connection: rpc.MessageConnection;
+
+	private _hostNotification = new rpc.NotificationType<any, any>("host/msg");
+	private _incomingNotification = new rpc.NotificationType<any, any>("ext/msg");
+
+	private _onMessage = new Emitter<IncomingMessage>();
+	readonly onMessage: Event<IncomingMessage> = this._onMessage.event;
+
+	constructor() {
+		this._connection = rpc.createMessageConnection(
+			new rpc.StreamMessageReader(process.stdin),
+			new rpc.StreamMessageWriter(process.stdout),
+		);
+
+		this._connection.onNotification(this._incomingNotification, (payload: any) => {
+			this._onMessage.fire(payload);
+		});
+
+		this._connection.listen();
+	}
+
+	public send(msg: OutgoingMessage) {
+		this._connection.sendNotification(this._hostNotification, msg);
+	}
 }
 
 // This calls exit directly in case the initialization is not finished and we need to exit
@@ -43,26 +72,21 @@ let onTerminate = function () {
 	exit();
 };
 
-function createExtHostProtocol(): Promise<IMessagePassingProtocol> {
+function createExtHostProtocol(): Promise<IExtensionHostProtocol> {
 
-	const pipeName = process.env.VSCODE_IPC_HOOK_EXTHOST!;
+	return new Promise<IExtensionHostProtocol>((resolve, reject) => {
 
-	return new Promise<IMessagePassingProtocol>((resolve, reject) => {
-
-		const socket = createConnection(pipeName, () => {
-			socket.removeListener('error', reject);
-			resolve(new Protocol(socket));
-		});
-		socket.once('error', reject);
+		/* ONIVIM2 - use stdio JSONRPC protocl */
+		resolve(new JsonRpcProtocol())
 
 	}).then(protocol => {
 
-		return new class implements IMessagePassingProtocol {
+		return new class implements IExtensionHostProtocol {
 
 			private _terminating = false;
 
-			readonly onMessage: Event<any> = Event.filter(protocol.onMessage, msg => {
-				if (!isMessageOfType(msg, MessageType.Terminate)) {
+			readonly onMessage: Event<IncomingMessage> = Event.filter(protocol.onMessage, msg => {
+				if (!isMessageOfType(msg, IncomingMessageType.Terminate)) {
 					return true;
 				}
 				this._terminating = true;
@@ -70,7 +94,7 @@ function createExtHostProtocol(): Promise<IMessagePassingProtocol> {
 				return false;
 			});
 
-			send(msg: any): void {
+			send(msg: OutgoingMessage): void {
 				if (!this._terminating) {
 					protocol.send(msg);
 				}
@@ -79,24 +103,24 @@ function createExtHostProtocol(): Promise<IMessagePassingProtocol> {
 	});
 }
 
-function connectToRenderer(protocol: IMessagePassingProtocol): Promise<IRendererConnection> {
+function connectToRenderer(protocol: IExtensionHostProtocol): Promise<IRendererConnection> {
 	return new Promise<IRendererConnection>((c, e) => {
-
 		// Listen init data message
 		const first = protocol.onMessage(raw => {
 			first.dispose();
 
-			const initData = <IInitData>JSON.parse(raw.toString());
+			const initData = <IRawInitData>(raw.payload);
 
-			const rendererCommit = initData.commit;
-			const myCommit = product.commit;
+			// ONIVIM2 - Is this necessary for us to check?
+			// const rendererCommit = initData.commit;
+			// const myCommit = product.commit;
 
-			if (rendererCommit && myCommit) {
-				// Running in the built version where commits are defined
-				if (rendererCommit !== myCommit) {
-					exit(55);
-				}
-			}
+			// if (rendererCommit && myCommit) {
+			// 	// Running in the built version where commits are defined
+			// 	if (rendererCommit !== myCommit) {
+			// 		exit(55);
+			// 	}
+			// }
 
 			// Print a console message when rejection isn't handled within N seconds. For details:
 			// see https://nodejs.org/api/process.html#process_event_unhandledrejection
@@ -140,26 +164,28 @@ function connectToRenderer(protocol: IMessagePassingProtocol): Promise<IRenderer
 				}
 			}, 1000);
 
+			// TODO - ONIVIM2: Bring back!
+			//
 			// In certain cases, the event loop can become busy and never yield
 			// e.g. while-true or process.nextTick endless loops
 			// So also use the native node module to do it from a separate thread
-			let watchdog: typeof nativeWatchdog;
-			try {
-				watchdog = require.__$__nodeRequire('native-watchdog');
-				watchdog.start(initData.parentPid);
-			} catch (err) {
-				// no problem...
-				onUnexpectedError(err);
-			}
+			// let watchdog: typeof nativeWatchdog;
+			// try {
+			// 	watchdog = require.__$__nodeRequire('native-watchdog');
+			// 	watchdog.start(initData.parentPid);
+			// } catch (err) {
+			// 	// no problem...
+			// 	onUnexpectedError(err);
+			// }
 
 			// Tell the outside that we are initialized
-			protocol.send(createMessageOfType(MessageType.Initialized));
+			protocol.send(createMessageOfType(OutgoingMessageType.Initialized));
 
 			c({ protocol, initData });
 		});
 
 		// Tell the outside that we are ready to receive messages
-		protocol.send(createMessageOfType(MessageType.Ready));
+		protocol.send(createMessageOfType(OutgoingMessageType.Ready));
 	});
 }
 
@@ -170,7 +196,14 @@ createExtHostProtocol().then(protocol => {
 	return connectToRenderer(protocol);
 }).then(renderer => {
 	// setup things
-	const extensionHostMain = new ExtensionHostMain(renderer.protocol, renderer.initData);
+
+
+	/* TODO:
+	 * Wire up JSON protocol in the ExtensionHostMain
+	 */
+	let tempProtocol: any = renderer.protocol;
+
+	const extensionHostMain = new ExtensionHostMain(tempProtocol, renderer.initData);
 	onTerminate = () => extensionHostMain.terminate();
 }).catch(err => console.error(err));
 

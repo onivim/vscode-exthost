@@ -24,18 +24,18 @@ import { Protocol, generateRandomPipeName, BufferedProtocol } from 'vs/base/part
 import { IBroadcast, IBroadcastService } from 'vs/workbench/services/broadcast/electron-browser/broadcastService';
 import { IEnvironmentService } from 'vs/platform/environment/common/environment';
 import { EXTENSION_ATTACH_BROADCAST_CHANNEL, EXTENSION_CLOSE_EXTHOST_BROADCAST_CHANNEL, EXTENSION_LOG_BROADCAST_CHANNEL, EXTENSION_RELOAD_BROADCAST_CHANNEL, EXTENSION_TERMINATE_BROADCAST_CHANNEL } from 'vs/platform/extensions/common/extensionHost';
-import { ILabelService } from 'vs/platform/label/common/label';
+// import { ILabelService } from 'vs/platform/label/common/label';
 import { ILifecycleService, WillShutdownEvent } from 'vs/platform/lifecycle/common/lifecycle';
-import { ILogService } from 'vs/platform/log/common/log';
+// import { ILogService } from 'vs/platform/log/common/log';
 import product from 'vs/platform/product/node/product';
 import { INotificationService, Severity } from 'vs/platform/notification/common/notification';
-import { ITelemetryService } from 'vs/platform/telemetry/common/telemetry';
+// import { ITelemetryService } from 'vs/platform/telemetry/common/telemetry';
 import { IWindowService, IWindowsService } from 'vs/platform/windows/common/windows';
-import { IWorkspaceContextService, WorkbenchState } from 'vs/platform/workspace/common/workspace';
-import { IInitData } from 'vs/workbench/api/node/extHost.protocol';
-import { MessageType, createMessageOfType, isMessageOfType } from 'vs/workbench/services/extensions/node/extensionHostProtocol';
-import { IExtensionDescription } from 'vs/workbench/services/extensions/common/extensions';
-import { withNullAsUndefined } from 'vs/base/common/types';
+// import { IWorkspaceContextService, WorkbenchState } from 'vs/platform/workspace/common/workspace';
+// import { IInitData } from 'vs/workbench/api/node/extHost.protocol';
+// import { MessageType, createMessageOfType, isMessageOfType } from 'vs/workbench/services/extensions/node/extensionHostProtocol';
+// import { IExtensionDescription } from 'vs/workbench/services/extensions/common/extensions';
+// import { withNullAsUndefined } from 'vs/base/common/types';
 
 export interface IExtensionHostStarter {
 	readonly onCrashed: Event<[number, string]>;
@@ -90,19 +90,19 @@ export class ExtensionHostProcessWorker implements IExtensionHostStarter {
 	private _messageProtocol: Promise<IMessagePassingProtocol> | null;
 
 	constructor(
-		private readonly _autoStart: boolean,
-		private readonly _extensions: Promise<IExtensionDescription[]>,
-		private readonly _extensionHostLogsLocation: URI,
-		@IWorkspaceContextService private readonly _contextService: IWorkspaceContextService,
+		// private readonly _autoStart: boolean,
+		// private readonly _extensions: Promise<IExtensionDescription[]>,
+		// private readonly _extensionHostLogsLocation: URI,
+		// @IWorkspaceContextService private readonly _contextService: IWorkspaceContextService,
 		@INotificationService private readonly _notificationService: INotificationService,
 		@IWindowsService private readonly _windowsService: IWindowsService,
 		@IWindowService private readonly _windowService: IWindowService,
 		@IBroadcastService private readonly _broadcastService: IBroadcastService,
 		@ILifecycleService private readonly _lifecycleService: ILifecycleService,
 		@IEnvironmentService private readonly _environmentService: IEnvironmentService,
-		@ITelemetryService private readonly _telemetryService: ITelemetryService,
-		@ILogService private readonly _logService: ILogService,
-		@ILabelService private readonly _labelService: ILabelService
+		// @ITelemetryService private readonly _telemetryService: ITelemetryService,
+		// @ILogService private readonly _logService: ILogService,
+		// @ILabelService private readonly _labelService: ILabelService
 	) {
 		const devOpts = parseExtensionDevOptions(this._environmentService);
 		this._isExtensionDevHost = devOpts.isExtensionDevHost;
@@ -370,86 +370,86 @@ export class ExtensionHostProcessWorker implements IExtensionHostStarter {
 			// 2) wait for the incoming `initialized` event.
 			return new Promise<IMessagePassingProtocol>((resolve, reject) => {
 
-				let timeoutHandle: NodeJS.Timer;
-				const installTimeoutCheck = () => {
-					timeoutHandle = setTimeout(() => {
-						reject('timeout');
-					}, 60 * 1000);
-				};
-				const uninstallTimeoutCheck = () => {
-					clearTimeout(timeoutHandle);
-				};
+				// let timeoutHandle: NodeJS.Timer;
+				// const installTimeoutCheck = () => {
+				// 	timeoutHandle = setTimeout(() => {
+				// 		reject('timeout');
+				// 	}, 60 * 1000);
+				// };
+				// const uninstallTimeoutCheck = () => {
+				// 	clearTimeout(timeoutHandle);
+				// };
 
-				// Wait 60s for the ready message
-				installTimeoutCheck();
+				// // Wait 60s for the ready message
+				// installTimeoutCheck();
 
-				const disposable = protocol.onMessage(msg => {
+				// const disposable = protocol.onMessage(msg => {
 
-					if (isMessageOfType(msg, MessageType.Ready)) {
-						// 1) Extension Host is ready to receive messages, initialize it
-						uninstallTimeoutCheck();
+					// if (isMessageOfType(msg, MessageType.Ready)) {
+					// 	// 1) Extension Host is ready to receive messages, initialize it
+					// 	uninstallTimeoutCheck();
 
-						this._createExtHostInitData().then(data => {
+					// 	this._createExtHostInitData().then(data => {
 
-							// Wait 60s for the initialized message
-							installTimeoutCheck();
+					// 		// Wait 60s for the initialized message
+					// 		installTimeoutCheck();
 
-							protocol.send(Buffer.from(JSON.stringify(data)));
-						});
-						return;
-					}
+					// 		protocol.send(Buffer.from(JSON.stringify(data)));
+					// 	});
+					// 	return;
+					// }
 
-					if (isMessageOfType(msg, MessageType.Initialized)) {
-						// 2) Extension Host is initialized
-						uninstallTimeoutCheck();
+					// if (isMessageOfType(msg, MessageType.Initialized)) {
+					// 	// 2) Extension Host is initialized
+					// 	uninstallTimeoutCheck();
 
-						// stop listening for messages here
-						disposable.dispose();
+					// 	// stop listening for messages here
+					// 	disposable.dispose();
 
-						// release this promise
-						resolve(protocol);
-						return;
-					}
+					// 	// release this promise
+					// 	resolve(protocol);
+					// 	return;
+					// }
 
-					console.error(`received unexpected message during handshake phase from the extension host: `, msg);
-				});
+					// console.error(`received unexpected message during handshake phase from the extension host: `, msg);
+				// });
 
 			});
 
 		});
 	}
 
-	private _createExtHostInitData(): Promise<IInitData> {
-		return Promise.all([this._telemetryService.getTelemetryInfo(), this._extensions])
-			.then(([telemetryInfo, extensionDescriptions]) => {
-				const workspace = this._contextService.getWorkspace();
-				const r: IInitData = {
-					commit: product.commit,
-					parentPid: process.pid,
-					environment: {
-						isExtensionDevelopmentDebug: this._isExtensionDevDebug,
-						appRoot: this._environmentService.appRoot ? URI.file(this._environmentService.appRoot) : undefined,
-						appSettingsHome: this._environmentService.appSettingsHome ? URI.file(this._environmentService.appSettingsHome) : undefined,
-						extensionDevelopmentLocationURI: this._environmentService.extensionDevelopmentLocationURI,
-						extensionTestsLocationURI: this._environmentService.extensionTestsLocationURI,
-						globalStorageHome: URI.file(this._environmentService.globalStorageHome)
-					},
-					workspace: this._contextService.getWorkbenchState() === WorkbenchState.EMPTY ? undefined : {
-						configuration: withNullAsUndefined(workspace.configuration),
-						id: workspace.id,
-						name: this._labelService.getWorkspaceLabel(workspace)
-					},
-					resolvedExtensions: [],
-					hostExtensions: [],
-					extensions: extensionDescriptions,
-					telemetryInfo,
-					logLevel: this._logService.getLevel(),
-					logsLocation: this._extensionHostLogsLocation,
-					autoStart: this._autoStart
-				};
-				return r;
-			});
-	}
+	// private _createExtHostInitData(): Promise<IInitData> {
+	// 	return Promise.all([this._telemetryService.getTelemetryInfo(), this._extensions])
+	// 		.then(([telemetryInfo, extensionDescriptions]) => {
+	// 			const workspace = this._contextService.getWorkspace();
+	// 			const r: IInitData = {
+	// 				commit: product.commit,
+	// 				parentPid: process.pid,
+	// 				environment: {
+	// 					isExtensionDevelopmentDebug: this._isExtensionDevDebug,
+	// 					appRoot: this._environmentService.appRoot ? URI.file(this._environmentService.appRoot) : undefined,
+	// 					appSettingsHome: this._environmentService.appSettingsHome ? URI.file(this._environmentService.appSettingsHome) : undefined,
+	// 					extensionDevelopmentLocationURI: this._environmentService.extensionDevelopmentLocationURI,
+	// 					extensionTestsLocationURI: this._environmentService.extensionTestsLocationURI,
+	// 					globalStorageHome: URI.file(this._environmentService.globalStorageHome)
+	// 				},
+	// 				workspace: this._contextService.getWorkbenchState() === WorkbenchState.EMPTY ? undefined : {
+	// 					configuration: withNullAsUndefined(workspace.configuration),
+	// 					id: workspace.id,
+	// 					name: this._labelService.getWorkspaceLabel(workspace)
+	// 				},
+	// 				resolvedExtensions: [],
+	// 				hostExtensions: [],
+	// 				extensions: extensionDescriptions,
+	// 				telemetryInfo,
+	// 				logLevel: this._logService.getLevel(),
+	// 				logsLocation: this._extensionHostLogsLocation,
+	// 				autoStart: this._autoStart
+	// 			};
+	// 			return r;
+	// 		});
+	// }
 
 	private _logExtensionHostMessage(entry: IRemoteConsoleLog) {
 
@@ -537,38 +537,38 @@ export class ExtensionHostProcessWorker implements IExtensionHostStarter {
 			return;
 		}
 
-		this._messageProtocol.then((protocol) => {
+		// this._messageProtocol.then((protocol) => {
 
-			// Send the extension host a request to terminate itself
-			// (graceful termination)
-			protocol.send(createMessageOfType(MessageType.Terminate));
+		// 	// Send the extension host a request to terminate itself
+		// 	// (graceful termination)
+		// 	// protocol.send(createMessageOfType(MessageType.Terminate));
 
-			// Give the extension host 10s, after which we will
-			// try to kill the process and release any resources
-			setTimeout(() => this._cleanResources(), 10 * 1000);
+		// 	// Give the extension host 10s, after which we will
+		// 	// try to kill the process and release any resources
+		// 	setTimeout(() => this._cleanResources(), 10 * 1000);
 
-		}, (err) => {
+		// }, (err) => {
 
-			// Establishing a protocol with the extension host failed, so
-			// try to kill the process and release any resources.
-			this._cleanResources();
-		});
+		// 	// Establishing a protocol with the extension host failed, so
+		// 	// try to kill the process and release any resources.
+		// 	this._cleanResources();
+		// });
 	}
 
-	private _cleanResources(): void {
-		if (this._namedPipeServer) {
-			this._namedPipeServer.close();
-			this._namedPipeServer = null;
-		}
-		if (this._extensionHostConnection) {
-			this._extensionHostConnection.end();
-			this._extensionHostConnection = null;
-		}
-		if (this._extensionHostProcess) {
-			this._extensionHostProcess.kill();
-			this._extensionHostProcess = null;
-		}
-	}
+	// private _cleanResources(): void {
+	// 	if (this._namedPipeServer) {
+	// 		this._namedPipeServer.close();
+	// 		this._namedPipeServer = null;
+	// 	}
+	// 	if (this._extensionHostConnection) {
+	// 		this._extensionHostConnection.end();
+	// 		this._extensionHostConnection = null;
+	// 	}
+	// 	if (this._extensionHostProcess) {
+	// 		this._extensionHostProcess.kill();
+	// 		this._extensionHostProcess = null;
+	// 	}
+	// }
 
 	private _onWillShutdown(event: WillShutdownEvent): void {
 

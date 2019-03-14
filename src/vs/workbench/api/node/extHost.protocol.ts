@@ -27,7 +27,7 @@ import { IMarkerData } from 'vs/platform/markers/common/markers';
 import { IPickOptions, IQuickInputButton, IQuickPickItem } from 'vs/platform/quickinput/common/quickInput';
 import { IPatternInfo, IRawFileMatch2, IRawQuery, IRawTextQuery, ISearchCompleteStats } from 'vs/workbench/services/search/common/search';
 import { StatusbarAlignment as MainThreadStatusBarAlignment } from 'vs/platform/statusbar/common/statusbar';
-import { ITelemetryInfo } from 'vs/platform/telemetry/common/telemetry';
+// import { ITelemetryInfo } from 'vs/platform/telemetry/common/telemetry';
 import { ThemeColor } from 'vs/platform/theme/common/themeService';
 import { EndOfLine, IFileOperationOptions, TextEditorLineNumbersStyle } from 'vs/workbench/api/node/extHostTypes';
 import { EditorViewColumn } from 'vs/workbench/api/shared/editor';
@@ -36,6 +36,7 @@ import { ITreeItem, IRevealOptions } from 'vs/workbench/common/views';
 import { IAdapterDescriptor, IConfig, ITerminalSettings } from 'vs/workbench/contrib/debug/common/debug';
 import { ITextQueryBuilderOptions } from 'vs/workbench/contrib/search/common/queryBuilder';
 import { ITerminalDimensions } from 'vs/workbench/contrib/terminal/common/terminal';
+import { IExtensionManifest } from 'vs/platform/extensions/common/extensions';
 import { IExtensionDescription } from 'vs/workbench/services/extensions/common/extensions';
 import { IRPCProtocol, createExtHostContextProxyIdentifier as createExtId, createMainContextProxyIdentifier as createMainId } from 'vs/workbench/services/extensions/node/proxyIdentifier';
 import { IProgressOptions, IProgressStep } from 'vs/platform/progress/common/progress';
@@ -66,6 +67,33 @@ export interface IWorkspaceData extends IStaticWorkspaceData {
 	folders: { uri: UriComponents, name: string, index: number }[];
 }
 
+export interface IRawEnvironment {
+	isExtensionDevelopmentDebug: boolean;
+	appRootPath: string;
+	appSettingsHomePath: string;
+	extensionDevelopmentLocationPath: string;
+	extensionTestsLocationPath: string;
+	globalStorageHome: string;
+}
+
+export interface IRawExtensionDescription extends IExtensionManifest {
+	readonly identifier: ExtensionIdentifier;
+	readonly uuid?: string;
+	readonly isBuiltin: boolean;
+	readonly isUnderDevelopment: boolean;
+	readonly extensionLocationPath: string;
+	enableProposedApi?: boolean;
+}
+
+export interface IRawInitData {
+	parentPid: number;
+	environment: IRawEnvironment;
+	logLevel: LogLevel,
+	logsLocationPath: string
+	autoStart: boolean;
+	extensions: IRawExtensionDescription[];
+}
+
 export interface IInitData {
 	commit?: string;
 	parentPid: number;
@@ -74,7 +102,7 @@ export interface IInitData {
 	resolvedExtensions: ExtensionIdentifier[];
 	hostExtensions: ExtensionIdentifier[];
 	extensions: IExtensionDescription[];
-	telemetryInfo: ITelemetryInfo;
+	// telemetryInfo: ITelemetryInfo;
 	logLevel: LogLevel;
 	logsLocation: URI;
 	autoStart: boolean;

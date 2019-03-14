@@ -3,33 +3,35 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-export const enum MessageType {
-	Initialized,
-	Ready,
-	Terminate
+
+import { IJsonRpcProtocol } from 'vs/base/parts/ipc/node/ipc';
+
+export const enum OutgoingMessageType {
+	Initialized = 0,
+	Ready = 1,
 }
 
-export function createMessageOfType(type: MessageType): Buffer {
-	const result = Buffer.allocUnsafe(1);
-
-	switch (type) {
-		case MessageType.Initialized: result.writeUInt8(1, 0); break;
-		case MessageType.Ready: result.writeUInt8(2, 0); break;
-		case MessageType.Terminate: result.writeUInt8(3, 0); break;
-	}
-
-	return result;
+export interface OutgoingMessage {
+	type: OutgoingMessageType,
 }
 
-export function isMessageOfType(message: Buffer, type: MessageType): boolean {
-	if (message.length !== 1) {
-		return false;
-	}
+export interface IncomingMessage {
+	type: IncomingMessageType,
+	payload: any,
+};
 
-	switch (message.readUInt8(0)) {
-		case 1: return type === MessageType.Initialized;
-		case 2: return type === MessageType.Ready;
-		case 3: return type === MessageType.Terminate;
-		default: return false;
-	}
+export const enum IncomingMessageType {
+	InitData = 0,
+	Terminate = 1,
+}
+
+export interface IExtensionHostProtocol extends IJsonRpcProtocol<IncomingMessage, OutgoingMessage> { };
+
+export function createMessageOfType(type: OutgoingMessageType): OutgoingMessage {
+	let message: OutgoingMessage =  { type: type };
+	return message;
+}
+
+export function isMessageOfType(message: IncomingMessage, type: IncomingMessageType): boolean {
+	return message.type === type;
 }

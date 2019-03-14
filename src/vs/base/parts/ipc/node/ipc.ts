@@ -41,6 +41,11 @@ interface IHandler {
 	(response: IRawResponse): void;
 }
 
+export interface IJsonRpcProtocol<T, U> {
+	onMessage: Event<T>;
+	send(msg: U): void;
+}
+
 export interface IMessagePassingProtocol {
 	send(buffer: Buffer): void;
 	onMessage: Event<Buffer>;
