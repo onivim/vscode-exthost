@@ -67,11 +67,15 @@ export class Event<T> implements IEvent<T> {
     }
 }
 
+type filterFunc = (payload: any) => boolean;
+
 export interface IExtensionHost {
 
     start: () => Promise<void>;
 
     sendNotification: (payload: any) => void;
+
+    waitForMessageOnce: (rpcName: string, methodName: string, filter?: filterFunc) => Promise<void>;
 
     onMessage: IEvent<any>;
 }
@@ -173,6 +177,31 @@ export let withExtensionHost = async (extensions: string[], f: apiFunction) => {
         await promise;
     };
 
+
+    let defaultFilter = (payload: any) => true;
+
+    let waitForMessageOnce = (expectedRpc: string, expectedMethod: string, filter:filterFunc = defaultFilter): Promise<void> => {
+        return new Promise<void>((c) => {
+            let subscription = onMessageEvent.subscribe((v) => {
+
+                if (!v.payload) {
+                    return;
+                }
+
+                const { args, rpcName, methodName } = v.payload;
+
+                console.log(`waitForMessageOnce: [${rpcName} | ${methodName}]: ${args}`);
+
+                if (rpcName === expectedRpc && expectedMethod == methodName && filter(args)) {
+                    c();
+                    subscription.dispose();
+                }
+            })
+        });
+        
+    };
+
+
     let sendNotification = (payload) => connection.sendNotification(outgoingNotification, {
         type: MessageType.RequestJSONArgs,
         reqId: requestId++,
@@ -183,6 +212,7 @@ export let withExtensionHost = async (extensions: string[], f: apiFunction) => {
         start,
         sendNotification,
         onMessage: onMessageEvent,
+        waitForMessageOnce,
     };
 
     await f(extHost);
