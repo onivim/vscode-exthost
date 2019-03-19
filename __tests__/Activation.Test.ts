@@ -1,24 +1,8 @@
-const cp = require("child_process");
-const fs = require("fs");
-const path = require("path");
-const rpc = require("vscode-jsonrpc");
-
-let bootstrapForkPath = path.join(__dirname, "..", "out", "bootstrap-fork.js");
-
-let extensionPath = path.join(__dirname, "..", "extensions", "oni-api-tests", "package.json");
+import * as path from "path";
 
 import * as ExtensionHost from "./ExtensionHost";
 
-describe("initialization", () => {
-    test("extension host process gets initialized", async () => {
-
-        await ExtensionHost.withExtensionHost([], async (api) => {
-            // expect(true).toBe(true);
-            await api.start();
-            return Promise.resolve();
-        });
-    });
-});
+let extensionPath = path.join(__dirname, "..", "extensions", "oni-api-tests", "package.json");
 
 describe("activation", () => {
     test("get activation event for '*' activation type", async () => {
