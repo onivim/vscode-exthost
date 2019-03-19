@@ -122,6 +122,7 @@
     "sinon": "^1.17.2",
     "source-map": "^0.4.4",
     "ts-loader": "^4.4.2",
+    "ts-jest": "^24.0.0",
     "tslint": "^5.11.0",
     "typescript": "3.3.1",
     "typescript-formatter": "7.1.0",

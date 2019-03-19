@@ -6,7 +6,7 @@
 	"enableProposedApi": true,
 	"private": true,
 	"main": "horse",
-	"activationEvents": [],
+	"activationEvents": ["*"],
 	"engines": {
 		"vscode": "^1.25.0"
 	},

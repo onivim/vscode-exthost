@@ -37,19 +37,26 @@ export class ProxyIdentifier<T> {
 }
 
 const identifiers: ProxyIdentifier<any>[] = [];
+const stringToId: {[key: string]: number} = {}
 
 export function createMainContextProxyIdentifier<T>(identifier: string): ProxyIdentifier<T> {
 	const result = new ProxyIdentifier<T>(true, identifier);
 	identifiers[result.nid] = result;
+	stringToId[result.sid] = result.nid;
 	return result;
 }
 
 export function createExtHostContextProxyIdentifier<T>(identifier: string): ProxyIdentifier<T> {
 	const result = new ProxyIdentifier<T>(false, identifier);
 	identifiers[result.nid] = result;
+	stringToId[result.sid] = result.nid;
 	return result;
 }
 
 export function getStringIdentifierForProxy(nid: number): string {
 	return identifiers[nid].sid;
+}
+
+export function getNumberIdentifierForProxy(proxyId: string): number {
+	return stringToId[proxyId];
 }

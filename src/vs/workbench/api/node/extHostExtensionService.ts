@@ -22,7 +22,7 @@ import { ExtHostStorage } from 'vs/workbench/api/node/extHostStorage';
 import { ExtHostWorkspace } from 'vs/workbench/api/node/extHostWorkspace';
 import { IExtensionDescription } from 'vs/workbench/services/extensions/common/extensions';
 import { ExtensionDescriptionRegistry } from 'vs/workbench/services/extensions/node/extensionDescriptionRegistry';
-import { connectProxyResolver } from 'vs/workbench/services/extensions/node/proxyResolver';
+// import { connectProxyResolver } from 'vs/workbench/services/extensions/node/proxyResolver';
 import { CancellationTokenSource } from 'vs/base/common/cancellation';
 import * as errors from 'vs/base/common/errors';
 import { ResolvedAuthority } from 'vs/platform/remote/common/remoteAuthorityResolver';
@@ -213,13 +213,13 @@ export class ExtHostExtensionService implements ExtHostExtensionServiceShape {
 
 				switch (severity) {
 					case Severity.Error:
-						console.error(message);
+						console.error("[error] " + message);
 						break;
 					case Severity.Warning:
-						console.warn(message);
+						console.error("[warn] " + message);
 						break;
 					default:
-						console.log(message);
+						console.error("[log] " + message);
 				}
 			},
 
@@ -254,8 +254,10 @@ export class ExtHostExtensionService implements ExtHostExtensionServiceShape {
 			const configProvider = await this._extHostConfiguration.getConfigProvider();
 			await initializeExtensionApi(this, this._extensionApiFactory, this._registry, configProvider);
 			// Do this when extension service exists, but extensions are not being activated yet.
-			await connectProxyResolver(this._extHostWorkspace, configProvider, this, this._extHostLogService, this._mainThreadTelemetryProxy);
-			this._almostReadyToRunExtensions.open();
+
+			// TODO ONIVIM2: Re-enable this
+			// await connectProxyResolver(this._extHostWorkspace, configProvider, this, this._extHostLogService, this._mainThreadTelemetryProxy);
+			// this._almostReadyToRunExtensions.open();
 
 			await this._extHostWorkspace.waitForInitializeCall();
 			this._readyToRunExtensions.open();
@@ -387,6 +389,7 @@ export class ExtHostExtensionService implements ExtHostExtensionServiceShape {
 			this._logExtensionActivationTimes(extensionDescription, reason, 'success', activationTimes);
 			return activatedExtension;
 		}, (err) => {
+			console.error("Failed to activate extensions: " + err);
 			this._mainThreadExtensionsProxy.$onExtensionActivationFailed(extensionDescription.identifier);
 			this._logExtensionActivationTimes(extensionDescription, reason, 'failure');
 			throw err;
@@ -412,7 +415,7 @@ export class ExtHostExtensionService implements ExtHostExtensionServiceShape {
 	}
 
 	private _doActivateExtension(extensionDescription: IExtensionDescription, reason: ExtensionActivationReason): Promise<ActivatedExtension> {
-		const event = getTelemetryActivationEvent(extensionDescription, reason);
+		// const event = getTelemetryActivationEvent(extensionDescription, reason);
 		/* __GDPR__
 			"activatePlugin" : {
 				"${include}": [
@@ -420,7 +423,7 @@ export class ExtHostExtensionService implements ExtHostExtensionServiceShape {
 				]
 			}
 		*/
-		this._mainThreadTelemetryProxy.$publicLog('activatePlugin', event);
+		// this._mainThreadTelemetryProxy.$publicLog('activatePlugin', event);
 		if (!extensionDescription.main) {
 			// Treat the extension as being empty => NOT AN ERROR CASE
 			return Promise.resolve(new EmptyExtension(ExtensionActivationTimes.NONE));
@@ -438,7 +441,6 @@ export class ExtHostExtensionService implements ExtHostExtensionServiceShape {
 	}
 
 	private _loadExtensionContext(extensionDescription: IExtensionDescription): Promise<IExtensionContext> {
-
 		const globalState = new ExtensionMemento(extensionDescription.identifier.value, true, this._storage);
 		const workspaceState = new ExtensionMemento(extensionDescription.identifier.value, false, this._storage);
 

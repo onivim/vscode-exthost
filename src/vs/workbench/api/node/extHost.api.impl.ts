@@ -149,7 +149,6 @@ export function createApiFactory(
 	ExtHostApiCommands.register(extHostCommands);
 
 	return function (extension: IExtensionDescription, extensionRegistry: ExtensionDescriptionRegistry, configProvider: ExtHostConfigProvider): typeof vscode {
-
 		// Check document selectors for being overly generic. Technically this isn't a problem but
 		// in practice many extensions say they support `fooLang` but need fs-access to do so. Those
 		// extension should specify then the `file`-scheme, e.g `{ scheme: 'fooLang', language: 'fooLang' }`
@@ -874,7 +873,6 @@ export function initializeExtensionApi(extensionService: ExtHostExtensionService
 }
 
 function defineAPI(factory: IExtensionApiFactory, extensionPaths: TernarySearchTree<IExtensionDescription>, extensionRegistry: ExtensionDescriptionRegistry, configProvider: ExtHostConfigProvider): void {
-
 	// each extension is meant to get its own api implementation
 	const extApiImpl = new Map<string, typeof vscode>();
 	let defaultApiImpl: typeof vscode;

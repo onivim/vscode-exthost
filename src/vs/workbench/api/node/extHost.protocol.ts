@@ -73,11 +73,11 @@ export interface IRawEnvironment {
 	appSettingsHomePath: string;
 	extensionDevelopmentLocationPath: string;
 	extensionTestsLocationPath: string;
-	globalStorageHome: string;
+	globalStorageHomePath: string;
 }
 
 export interface IRawExtensionDescription extends IExtensionManifest {
-	readonly identifier: ExtensionIdentifier;
+	readonly identifier: string;
 	readonly uuid?: string;
 	readonly isBuiltin: boolean;
 	readonly isUnderDevelopment: boolean;

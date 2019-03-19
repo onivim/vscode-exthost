@@ -8,15 +8,16 @@ import * as errors from 'vs/base/common/errors';
 import { IDisposable, dispose } from 'vs/base/common/lifecycle';
 import { Counter } from 'vs/base/common/numbers';
 import { URI, setUriThrowOnMissingScheme } from 'vs/base/common/uri';
-import { IURITransformer } from 'vs/base/common/uriIpc';
-import { IMessagePassingProtocol } from 'vs/base/parts/ipc/node/ipc';
+// import { IURITransformer } from 'vs/base/common/uriIpc';
+// import { IMessagePassingProtocol } from 'vs/base/parts/ipc/node/ipc';
 import { IRawEnvironment, IEnvironment, IRawExtensionDescription, IRawInitData, IInitData, MainContext, MainThreadConsoleShape } from 'vs/workbench/api/node/extHost.protocol';
 import { ExtHostConfiguration } from 'vs/workbench/api/node/extHostConfiguration';
 import { ExtHostExtensionService } from 'vs/workbench/api/node/extHostExtensionService';
 import { ExtHostLogService } from 'vs/workbench/api/node/extHostLogService';
 import { ExtHostWorkspace } from 'vs/workbench/api/node/extHostWorkspace';
 import { IExtensionDescription } from 'vs/workbench/services/extensions/common/extensions';
-import { RPCProtocol } from 'vs/workbench/services/extensions/node/rpcProtocol';
+import { IExtensionHostProtocol, JsonRPCProtocol } from 'vs/workbench/services/extensions/node/extensionHostProtocol';
+import { ExtensionIdentifier } from 'vs/platform/extensions/common/extensions';
 
 // we don't (yet) throw when extensions parse
 // uris that have no scheme
@@ -54,10 +55,10 @@ export class ExtensionHostMain {
 
 	private _searchRequestIdProvider: Counter;
 
-	constructor(protocol: IMessagePassingProtocol, rawInitData: IRawInitData) {
+	constructor(protocol: IExtensionHostProtocol, rawInitData: IRawInitData) {
 		this._isTerminating = false;
-		const uriTransformer: IURITransformer | null = null;
-		const rpcProtocol = new RPCProtocol(protocol, null, uriTransformer);
+		// const uriTransformer: IURITransformer | null = null;
+		const rpcProtocol = new JsonRPCProtocol(protocol);
 
 		// ensure URIs are transformed and revived
 		const initData = this.transform(rawInitData);
@@ -105,6 +106,7 @@ export class ExtensionHostMain {
 		const mainThreadExtensions = rpcProtocol.getProxy(MainContext.MainThreadExtensionService);
 		const mainThreadErrors = rpcProtocol.getProxy(MainContext.MainThreadErrors);
 		errors.setUnexpectedErrorHandler(err => {
+			console.error("UNEXPECTED ERROR: " + err)
 			const data = errors.transformErrorForSerialization(err);
 			const extension = extensionErrors.get(err);
 			if (extension) {
@@ -160,6 +162,7 @@ export class ExtensionHostMain {
 		let refineExtensions = (rawExtensionInfo: IRawExtensionDescription) => {
 			return <IExtensionDescription>{
 				...rawExtensionInfo,
+			    identifier: new ExtensionIdentifier(rawExtensionInfo.identifier),
 				extensionLocation: uriOrNull(rawExtensionInfo.extensionLocationPath)
 			}
 		};
@@ -171,7 +174,7 @@ export class ExtensionHostMain {
 				appSettingsHome: uriOrNull(rawEnvironment.appSettingsHomePath),
 				extensionDevelopmentLocationURI: uriOrNull(rawEnvironment.extensionDevelopmentLocationPath),
 				extensionTestsLocationURI: uriOrNull(rawEnvironment.extensionTestsLocationPath),
-				globalStorageHome: uriOrNull(rawEnvironment.globalStorageHome),
+				globalStorageHome: uriOrNull(rawEnvironment.globalStorageHomePath),
 			}
 		}
 

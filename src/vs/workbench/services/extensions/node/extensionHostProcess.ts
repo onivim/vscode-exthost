@@ -11,7 +11,7 @@ import { Event } from 'vs/base/common/event';
 // import { Protocol } from 'vs/base/parts/ipc/node/ipc.net';
 // import product from 'vs/platform/product/node/product';
 import { IRawInitData } from 'vs/workbench/api/node/extHost.protocol';
-import { IExtensionHostProtocol, isMessageOfType, IncomingMessageType, createMessageOfType, OutgoingMessageType, OutgoingMessage, IncomingMessage } from 'vs/workbench/services/extensions/node/extensionHostProtocol';
+import { IExtensionHostProtocol, isMessageOfType, createMessageOfType, MessageType, OutgoingMessage, IncomingMessage } from 'vs/workbench/services/extensions/node/extensionHostProtocol';
 import { exit, ExtensionHostMain } from 'vs/workbench/services/extensions/node/extensionHostMain';
 import * as rpc from "vscode-jsonrpc";
 
@@ -86,9 +86,10 @@ function createExtHostProtocol(): Promise<IExtensionHostProtocol> {
 			private _terminating = false;
 
 			readonly onMessage: Event<IncomingMessage> = Event.filter(protocol.onMessage, msg => {
-				if (!isMessageOfType(msg, IncomingMessageType.Terminate)) {
+				if (!isMessageOfType(msg, MessageType.Terminate)) {
 					return true;
 				}
+				console.error("Received termination message.");
 				this._terminating = true;
 				onTerminate();
 				return false;
@@ -179,13 +180,13 @@ function connectToRenderer(protocol: IExtensionHostProtocol): Promise<IRendererC
 			// }
 
 			// Tell the outside that we are initialized
-			protocol.send(createMessageOfType(OutgoingMessageType.Initialized));
+			protocol.send(createMessageOfType(MessageType.Initialized));
 
 			c({ protocol, initData });
 		});
 
 		// Tell the outside that we are ready to receive messages
-		protocol.send(createMessageOfType(OutgoingMessageType.Ready));
+		protocol.send(createMessageOfType(MessageType.Ready));
 	});
 }
 
@@ -201,9 +202,7 @@ createExtHostProtocol().then(protocol => {
 	/* TODO:
 	 * Wire up JSON protocol in the ExtensionHostMain
 	 */
-	let tempProtocol: any = renderer.protocol;
-
-	const extensionHostMain = new ExtensionHostMain(tempProtocol, renderer.initData);
+	const extensionHostMain = new ExtensionHostMain(renderer.protocol, renderer.initData);
 	onTerminate = () => extensionHostMain.terminate();
 }).catch(err => console.error(err));
 
