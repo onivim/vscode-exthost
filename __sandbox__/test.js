@@ -86,8 +86,7 @@ let run = async () => {
         }]],
     });
 
-    // await promise;
-    // console.log("HEY");
+    await promise;
     // setTimeout(() => {
     //     connection.sendNotification(extMessage, {
     //         type: 4,
@@ -96,6 +95,46 @@ let run = async () => {
     //     });
     // }, 1000);
 
+
+    let testModelAdded = {
+        uri: {
+            scheme: "file",
+            path: "D:/test1.txt",
+            lines: ["hello", "world"],
+            EOL: "\n",
+            modeId: "plaintext",
+            isDirty: true,
+        },
+    };
+
+    let update = {
+        removedDocuments: [],
+        addedDocuments: [testModelAdded],
+        removedEditors: [],
+        addedEditors: [],
+        newActiveEditor: null,
+    };
+
+
+    setTimeout(() => {
+        connection.sendNotification(extMessage, {
+            type: 4,
+            reqId: 3,
+            payload: ["ExtHostDocumentsAndEditors", "$acceptDocumentsAndEditorsDelta", [update]],
+        });
+    }, 1000);
+    setTimeout(() => {
+        connection.sendNotification(extMessage, {
+            type: 4,
+            reqId: 4,
+            payload: ["ExtHostDocumentsAndEditors", "$acceptDocumentsAndEditorsDelta", [{
+                removedDocuments: [testModelAdded.uri],
+                addedDocuments: [],
+                removedEditors: [],
+                addedEditors: [],
+            }]],
+        });
+    }, 2000);
 
     let closePromise = new Promise((c) => {
         connection.onClose(() => c());
