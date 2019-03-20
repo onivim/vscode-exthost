@@ -100,11 +100,11 @@ let run = async () => {
         uri: {
             scheme: "file",
             path: "D:/test1.txt",
-            lines: ["hello", "world"],
-            EOL: "\n",
-            modeId: "plaintext",
-            isDirty: true,
         },
+        lines: ["hello", "world"],
+        EOL: "\n",
+        modeId: "plaintext",
+        isDirty: true,
     };
 
     let update = {
@@ -124,15 +124,29 @@ let run = async () => {
         });
     }, 1000);
     setTimeout(() => {
+
+        let changedEvent = {
+            changes: [{
+                range: {
+                    startLineNumber: 1,
+                    endLineNumber: 1,
+                    startColumn: 1,
+                    endColumn: 6,
+                },
+                text: "GREETINGS",
+            }],
+            eol: "\n",
+            versionId: 100,
+        };
+
         connection.sendNotification(extMessage, {
             type: 4,
             reqId: 4,
-            payload: ["ExtHostDocumentsAndEditors", "$acceptDocumentsAndEditorsDelta", [{
-                removedDocuments: [testModelAdded.uri],
-                addedDocuments: [],
-                removedEditors: [],
-                addedEditors: [],
-            }]],
+            payload: ["ExtHostDocuments", "$acceptModelChanged", [
+                testModelAdded.uri,
+                changedEvent,
+                true,
+            ]],
         });
     }, 2000);
 
