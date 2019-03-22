@@ -23,4 +23,7 @@ steps:
   displayName: Compile Sources
 - powershell: |
     yarn test:oni
-  displayName: Run Oni Integration Tests
+  displayName: Run Integration Tests for Onivim 2
+- powershell: |
+    yarn package:oni
+  displayName: Package vscode-exthost for Onivim 2
