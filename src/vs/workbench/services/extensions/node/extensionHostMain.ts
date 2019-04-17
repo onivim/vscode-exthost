@@ -118,6 +118,10 @@ export class ExtensionHostMain {
 	}
 
 	private _patchPatchedConsole(mainThreadConsole: MainThreadConsoleShape): void {
+		console.log = (...args) => console.error("[LOG]", args);
+		console.info = (...args) => console.error("[INFO]", args);
+		console.warn = (...args) => console.error("[WARN]", args);
+
 		// The console is already patched to use `process.send()`
 		const nativeProcessSend = process.send!;
 		process.send = (...args: any[]) => {

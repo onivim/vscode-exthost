@@ -43,10 +43,10 @@ let run = async () => {
     });
     connection.listen();
 
-    let extensionPath = path.join(__dirname, "..", "extensions", "oni-api-tests", "package.json")
+    let extensionPath = path.join(__dirname, "..", "test_extensions", "oni-lsp-extension", "package.json")
     let testExtension = JSON.parse(fs.readFileSync(extensionPath));
 
-    testExtension.main = path.join(extensionPath, "..", "extension.js");
+    testExtension.main = path.join(path.dirname(extensionPath), testExtension.main);
 
     let extMessage = new rpc.NotificationType('ext/msg');
     connection.sendNotification(extMessage, {
@@ -56,8 +56,8 @@ let run = async () => {
             // extensions: [],
             extensions: [{
                 ...testExtension,
-                identifier: "Hello",
-                extensionLocationPath: extensionPath,
+                identifier: "lsp-sample",
+                extensionLocationPath: path.dirname(extensionPath),
             }],
             parentPid: process.pid,
             environment: {

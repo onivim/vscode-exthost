@@ -2,7 +2,7 @@ import * as path from "path";
 
 import * as ExtensionHost from "./ExtensionHost";
 
-let extensionPath = path.join(__dirname, "..", "extensions", "oni-api-tests", "package.json");
+let extensionPath = path.join(__dirname, "..", "test_extensions", "oni-api-tests", "package.json");
 
 describe("commands", () => {
     test.only("execute basic command", async () => {
@@ -15,7 +15,7 @@ describe("commands", () => {
             let commandRegistrationPromise = api.waitForMessageOnce("MainThreadCommands", "$registerCommand", (args) => args.indexOf("extension.helloWorld") >= 0);
 
             let showMessagePromise = api.waitForMessageOnce("MainThreadMessageService", "$showMessage");
-            
+
             await api.start();
 
             // Wait for the 'extension.helloWorld' command to be registered...

@@ -35,6 +35,13 @@ export interface IDisposable {
     dispose(): void
 }
 
+export interface ChangedEventRange {
+    startLineNumber: number,
+    endLineNumber: number,
+    startColumn: number,
+    endColumn: number,
+}
+
 export type DisposeFunction = () => void
 
 export type EventCallback<T> = (value: T) => void
@@ -76,6 +83,10 @@ export interface IExtensionHost {
     sendNotification: (payload: any) => void;
 
     waitForMessageOnce: (rpcName: string, methodName: string, filter?: filterFunc) => Promise<void>;
+
+    createDocument: (uri: any, lines: string[], modeId: string) => void;
+    updateDocument: (uri: any, range: ChangedEventRange, text: string, version: number) => void;
+
 
     onMessage: IEvent<any>;
 }
@@ -136,7 +147,7 @@ export let withExtensionHost = async (extensions: string[], f: apiFunction) => {
             let resolvedMetadata = {
                 ...metadata,
                 identifier: metadata.name,
-                extensionLocationPath: ext,
+                extensionLocationPath: path.dirname(ext),
             };
             return resolvedMetadata;
         });
@@ -208,11 +219,46 @@ export let withExtensionHost = async (extensions: string[], f: apiFunction) => {
         payload,
     });
 
+    let createDocument = (uri: any, lines: string[], modeId: string) => {
+            let testModelAdded = {
+                uri: uri,
+                lines: lines,
+                EOL: "\n",
+                modeId: modeId,
+                isDirty: true,
+            };
+
+            let update = {
+                removedDocuments: [],
+                addedDocuments: [testModelAdded],
+                removedEditors: [],
+                addedEditors: [],
+                newActiveEditor: null,
+            };
+
+            sendNotification(["ExtHostDocumentsAndEditors", "$acceptDocumentsAndEditorsDelta", [update]]);
+    };
+
+    let updateDocument = (uri: any, range: ChangedEventRange, text: string, versionId: number) => {
+         let changedEvent = {
+             changes: [{
+                 range: range,
+                 text: text,
+             }],
+             eol: "\n",
+             versionId: versionId,
+         };
+
+         sendNotification(["ExtHostDocuments", "$acceptModelChanged", [uri, changedEvent, true]]);
+    };
+
     let extHost = {
         start,
         sendNotification,
         onMessage: onMessageEvent,
         waitForMessageOnce,
+        createDocument,
+        updateDocument,
     };
 
     await f(extHost);
