@@ -15,9 +15,6 @@ steps:
 - powershell: |
     yarn
   displayName: Install Dependencies
-- script: |
-    yarn strict-null-check
-  displayName: Run Strict Null Checks
 - powershell: |
     yarn compile
   displayName: Compile Sources
