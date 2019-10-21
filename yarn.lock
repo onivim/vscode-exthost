@@ -8934,6 +8934,11 @@ vscode-debugprotocol@1.37.0:
   resolved "https://registry.yarnpkg.com/vscode-debugprotocol/-/vscode-debugprotocol-1.37.0.tgz#e8c4694a078d18ea1a639553a7a241b35c1e6f6d"
   integrity sha512-ppZLEBbFRVNsK0YpfgFi/x2CDyihx0F+UpdKmgeJcvi05UgSXYdO0n9sDVYwoGvvYQPvlpDQeWuY0nloOC4mPA==
 
+vscode-jsonrpc@*:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/vscode-jsonrpc/-/vscode-jsonrpc-4.0.0.tgz#a7bf74ef3254d0a0c272fab15c82128e378b3be9"
+  integrity sha512-perEnXQdQOJMTDFNv+UF3h1Y0z4iSiaN9jIlb0OqIYgosPCZGYh/MCUlkFtV2668PL69lRDO32hmvL2yiidUYg==
+
 vscode-minimist@^1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/vscode-minimist/-/vscode-minimist-1.2.1.tgz#e63d3f4a9bf3680dcb8f9304eed612323fd6926a"
