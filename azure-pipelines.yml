@@ -3,16 +3,16 @@ jobs:
   pool:
     vmImage: VS2017-Win2016
   steps:
-  - template: build/azure-pipelines/win32/continuous-build-win32.yml
+  - template: build/azure-pipelines/win32/continuous-build-oni.yml
 
 - job: Linux
   pool:
     vmImage: 'Ubuntu-16.04'
   steps:
-  - template: build/azure-pipelines/linux/continuous-build-linux.yml
+  - template: build/azure-pipelines/linux/continuous-build-oni.yml
 
 - job: macOS
   pool:
     vmImage: macOS 10.13
   steps:
-  - template: build/azure-pipelines/darwin/continuous-build-darwin.yml
+  - template: build/azure-pipelines/darwin/continuous-build-oni.yml
