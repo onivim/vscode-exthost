@@ -112,7 +112,6 @@ const requireSameVersionsInRemote = [
 	'xterm-addon-search',
 	'xterm-addon-web-links',
 	'node-pty',
-	'vscode-ripgrep'
 ];
 
 requireSameVersionsInRemote.forEach(packageName => {
