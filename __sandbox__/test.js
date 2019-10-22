@@ -39,6 +39,11 @@ let run = async () => {
                     reqId: 1,
                     payload: {
                         extensions: [],
+                        hostExtensions: [],
+                        resolvedExtensions: [],
+                        remote: {
+                            isRemote: false
+                        },
                         /*extensions: [{
                             ...testExtension,
                             identifier: "lsp-sample",
@@ -52,23 +57,6 @@ let run = async () => {
                         logsLocationPath: require("os").tmpdir(),
                         autoStart: true,
                     }
-                });
-
-                connection.sendNotification(extMessage, {
-                    type: 4, /* RequestJSONArgs */
-                    reqId: 2,
-                    payload: ["ExtHostConfiguration", "$initializeConfiguration", [{}]],
-                });
-
-                connection.sendNotification(extMessage, {
-                    type: 4, /* RequestJSONArgs */
-                    reqId: 2,
-                    payload: ["ExtHostWorkspace", "$initializeWorkspace", [{
-                        id: "workspace-test",
-                        name: "workspace-test",
-                        configuration: null,
-                        folders: [],
-                    }]],
                 });
 
             }
@@ -95,6 +83,24 @@ let run = async () => {
     //testExtension.main = path.join(path.dirname(extensionPath), testExtension.main);
 
     await promise;
+                
+                connection.sendNotification(extMessage, {
+                    type: 4, /* RequestJSONArgs */
+                    reqId: 2,
+                    payload: ["ExtHostConfiguration", "$initializeConfiguration", [{}]],
+                });
+
+                /*connection.sendNotification(extMessage, {
+                    type: 4, // RequestJSONArgs
+                    reqId: 2,
+                    payload: ["ExtHostWorkspace", "$initializeWorkspace", [{
+                        id: "workspace-test",
+                        name: "workspace-test",
+                        configuration: null,
+                        folders: [],
+                    }]],
+                });*/
+
     // setTimeout(() => {
     //     connection.sendNotification(extMessage, {
     //         type: 4,
