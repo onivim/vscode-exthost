@@ -7,7 +7,7 @@ import * as nativeWatchdog from 'native-watchdog';
 import * as net from 'net';
 import * as minimist from 'vscode-minimist';
 import { onUnexpectedError } from 'vs/base/common/errors';
-import { Event } from 'vs/base/common/event';
+import { Emitter, Event } from 'vs/base/common/event';
 import { IMessagePassingProtocol } from 'vs/base/parts/ipc/common/ipc';
 import { PersistentProtocol, ProtocolConstants, BufferedEmitter } from 'vs/base/parts/ipc/common/ipc.net';
 import { NodeSocket, WebSocketNodeSocket } from 'vs/base/parts/ipc/node/ipc.net';
@@ -22,6 +22,7 @@ import { realpath } from 'vs/base/node/extpath';
 import { IHostUtils } from 'vs/workbench/api/common/extHostExtensionService';
 import 'vs/workbench/api/node/extHost.services';
 import { RunOnceScheduler } from 'vs/base/common/async';
+import * as rpc from "vscode-jsonrpc";
 
 interface ParsedExtHostArgs {
 	uriTransformerPath?: string;
@@ -73,6 +74,34 @@ function patchProcess(allowExit: boolean) {
 interface IRendererConnection {
 	protocol: IMessagePassingProtocol;
 	initData: IInitData;
+}
+
+export class JsonRpcProtocol {
+
+	private _connection: rpc.MessageConnection;
+
+	private _hostNotification = new rpc.NotificationType<any, any>("host/msg");
+	private _incomingNotification = new rpc.NotificationType<any, any>("ext/msg");
+
+	private _onMessage = new Emitter<IncomingMessage>();
+	readonly onMessage: Event<IncomingMessage> = this._onMessage.event;
+
+	constructor() {
+		this._connection = rpc.createMessageConnection(
+			new rpc.StreamMessageReader(process.stdin),
+			new rpc.StreamMessageWriter(process.stdout),
+		);
+
+		this._connection.onNotification(this._incomingNotification, (payload: any) => {
+			this._onMessage.fire(payload);
+		});
+
+		this._connection.listen();
+	}
+
+	public send(msg: OutgoingMessage) {
+		this._connection.sendNotification(this._hostNotification, msg);
+	}
 }
 
 // This calls exit directly in case the initialization is not finished and we need to exit
@@ -276,6 +305,7 @@ function connectToRenderer(protocol: IMessagePassingProtocol): Promise<IRenderer
 }
 
 export async function startExtensionHostProcess(): Promise<void> {
+	console.error("-- starting exxtension host process");
 
 	const protocol = await createExtHostProtocol();
 	const renderer = await connectToRenderer(protocol);

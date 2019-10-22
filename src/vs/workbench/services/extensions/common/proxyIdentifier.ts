@@ -53,3 +53,7 @@ export function createExtHostContextProxyIdentifier<T>(identifier: string): Prox
 export function getStringIdentifierForProxy(nid: number): string {
 	return identifiers[nid].sid;
 }
+
+export function getNumberIdentifierForProxy(nid: number): number {
+	return identifiers[nid].nid;
+}

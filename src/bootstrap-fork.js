@@ -6,9 +6,11 @@
 //@ts-check
 'use strict';
 
-console.log("hey!");
+console.error("hey!");
 
 const bootstrap = require('./bootstrap');
+
+console.error("bootstrap called!");
 
 // ONIVIM: ASAR support not necessary
 // Enable ASAR in our forked processes

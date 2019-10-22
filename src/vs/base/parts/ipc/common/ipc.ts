@@ -63,9 +63,25 @@ interface IHandler {
 	(response: IRawResponse): void;
 }
 
+export interface IJsonRpcProtocol<T, U> {
+	onMessage: Event<T>;
+	send(msg: U): void;
+}
+
 export interface IMessagePassingProtocol {
 	send(buffer: VSBuffer): void;
 	onMessage: Event<VSBuffer>;
+}
+
+export class NoopMessagePassingProtocol implements IMessagePassingProtocol {
+
+	private _event = new Emitter<VSBuffer>();
+
+	public send(buffer: VSBuffer) {
+
+	}
+
+	public get onMessage() { return this._event.event; }
 }
 
 enum State {

@@ -220,8 +220,11 @@ export function createApiFactoryAndRegisterActors(accessor: ServicesAccessor): I
 
 		// namespace: env
 		const env: typeof vscode.env = {
-			get machineId() { return initData.telemetryInfo.machineId; },
-			get sessionId() { return initData.telemetryInfo.sessionId; },
+			// Onivim: No telemetry
+			//get machineId() { return initData.telemetryInfo.machineId; },
+			//get sessionId() { return initData.telemetryInfo.sessionId; },
+			get machineId() { return ""; },
+			get sessionId() { return ""; },
 			get language() { return initData.environment.appLanguage; },
 			get appName() { return initData.environment.appName; },
 			get appRoot() { return initData.environment.appRoot!.fsPath; },

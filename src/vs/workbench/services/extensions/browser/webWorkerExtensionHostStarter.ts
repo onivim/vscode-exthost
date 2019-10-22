@@ -10,7 +10,6 @@ import { IMessagePassingProtocol } from 'vs/base/parts/ipc/common/ipc';
 import { VSBuffer } from 'vs/base/common/buffer';
 import { createMessageOfType, MessageType, isMessageOfType } from 'vs/workbench/services/extensions/common/extensionHostProtocol';
 import { IInitData, UIKind } from 'vs/workbench/api/common/extHost.protocol';
-import { ITelemetryService } from 'vs/platform/telemetry/common/telemetry';
 import { IWorkspaceContextService, WorkbenchState } from 'vs/platform/workspace/common/workspace';
 import { ILabelService } from 'vs/platform/label/common/label';
 import { ILogService } from 'vs/platform/log/common/log';
@@ -34,7 +33,6 @@ export class WebWorkerExtensionHostStarter implements IExtensionHostStarter {
 		private readonly _autoStart: boolean,
 		private readonly _extensions: Promise<IExtensionDescription[]>,
 		private readonly _extensionHostLogsLocation: URI,
-		@ITelemetryService private readonly _telemetryService: ITelemetryService,
 		@IWorkspaceContextService private readonly _contextService: IWorkspaceContextService,
 		@ILabelService private readonly _labelService: ILabelService,
 		@ILogService private readonly _logService: ILogService,
@@ -118,7 +116,7 @@ export class WebWorkerExtensionHostStarter implements IExtensionHostStarter {
 	}
 
 	private async _createExtHostInitData(): Promise<IInitData> {
-		const [telemetryInfo, extensionDescriptions] = await Promise.all([this._telemetryService.getTelemetryInfo(), this._extensions]);
+		const extensionDescriptions = await this._extensions;
 		const workspace = this._contextService.getWorkspace();
 		return {
 			commit: this._productService.commit,
@@ -146,7 +144,7 @@ export class WebWorkerExtensionHostStarter implements IExtensionHostStarter {
 			resolvedExtensions: [],
 			hostExtensions: [],
 			extensions: extensionDescriptions,
-			telemetryInfo,
+			//telemetryInfo,
 			logLevel: this._logService.getLevel(),
 			logsLocation: this._extensionHostLogsLocation,
 			autoStart: this._autoStart,

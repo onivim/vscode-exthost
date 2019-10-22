@@ -4,14 +4,14 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { ipcRenderer as ipc } from 'electron';
-import { ExtensionHostProcessWorker } from 'vs/workbench/services/extensions/electron-browser/extensionHost';
+//import { ExtensionHostProcessWorker } from 'vs/workbench/services/extensions/electron-browser/extensionHost';
 import { CachedExtensionScanner } from 'vs/workbench/services/extensions/electron-browser/cachedExtensionScanner';
 import { registerSingleton } from 'vs/platform/instantiation/common/extensions';
 import { AbstractExtensionService } from 'vs/workbench/services/extensions/common/abstractExtensionService';
 import * as nls from 'vs/nls';
-import * as path from 'vs/base/common/path';
+//import * as path from 'vs/base/common/path';
 import { runWhenIdle } from 'vs/base/common/async';
-import { URI } from 'vs/base/common/uri';
+//import { URI } from 'vs/base/common/uri';
 import { IWorkbenchEnvironmentService } from 'vs/workbench/services/environment/common/environmentService';
 import { IExtensionManagementService } from 'vs/platform/extensionManagement/common/extensionManagement';
 import { IExtensionEnablementService } from 'vs/workbench/services/extensionManagement/common/extensionManagement';
@@ -37,7 +37,7 @@ import { Logger } from 'vs/workbench/services/extensions/common/extensionPoints'
 import { flatten } from 'vs/base/common/arrays';
 import { IStaticExtensionsService } from 'vs/workbench/services/extensions/common/staticExtensions';
 import { IElectronService } from 'vs/platform/electron/node/electron';
-import { IElectronEnvironmentService } from 'vs/workbench/services/electron/electron-browser/electronEnvironmentService';
+// import { IElectronEnvironmentService } from 'vs/workbench/services/electron/electron-browser/electronEnvironmentService';
 
 class DeltaExtensionsQueueItem {
 	constructor(
@@ -50,7 +50,7 @@ export class ExtensionService extends AbstractExtensionService implements IExten
 
 	private readonly _remoteExtensionsEnvironmentData: Map<string, IRemoteAgentEnvironment>;
 
-	private readonly _extensionHostLogsLocation: URI;
+	//private readonly _extensionHostLogsLocation: URI;
 	private readonly _extensionScanner: CachedExtensionScanner;
 	private _deltaExtensionsQueue: DeltaExtensionsQueueItem[];
 
@@ -70,7 +70,7 @@ export class ExtensionService extends AbstractExtensionService implements IExten
 		@IStaticExtensionsService private readonly _staticExtensions: IStaticExtensionsService,
 		@IElectronService private readonly _electronService: IElectronService,
 		@IHostService private readonly _hostService: IHostService,
-		@IElectronEnvironmentService private readonly _electronEnvironmentService: IElectronEnvironmentService
+		//@IElectronEnvironmentService private readonly _electronEnvironmentService: IElectronEnvironmentService
 	) {
 		super(
 			instantiationService,
@@ -93,7 +93,7 @@ export class ExtensionService extends AbstractExtensionService implements IExten
 
 		this._remoteExtensionsEnvironmentData = new Map<string, IRemoteAgentEnvironment>();
 
-		this._extensionHostLogsLocation = URI.file(path.join(this._environmentService.logsPath, `exthost${this._electronEnvironmentService.windowId}`));
+		//this._extensionHostLogsLocation = URI.file(path.join(this._environmentService.logsPath, `exthost${this._electronEnvironmentService.windowId}`));
 		this._extensionScanner = instantiationService.createInstance(CachedExtensionScanner);
 		this._deltaExtensionsQueue = [];
 
@@ -344,22 +344,22 @@ export class ExtensionService extends AbstractExtensionService implements IExten
 	}
 
 	protected _createExtensionHosts(isInitialStart: boolean, initialActivationEvents: string[]): ExtensionHostProcessManager[] {
-		let autoStart: boolean;
-		let extensions: Promise<IExtensionDescription[]>;
+		//let autoStart: boolean;
+		//let extensions: Promise<IExtensionDescription[]>;
 		if (isInitialStart) {
-			autoStart = false;
-			extensions = this._extensionScanner.scannedExtensions.then(extensions => extensions.filter(extension => this._isEnabled(extension))); // remove disabled extensions
+			//autoStart = false;
+			//extensions = this._extensionScanner.scannedExtensions.then(extensions => extensions.filter(extension => this._isEnabled(extension))); // remove disabled extensions
 		} else {
 			// restart case
-			autoStart = true;
-			extensions = this.getExtensions().then((extensions) => extensions.filter(ext => ext.extensionLocation.scheme === Schemas.file));
+			//autoStart = true;
+			//extensions = this.getExtensions().then((extensions) => extensions.filter(ext => ext.extensionLocation.scheme === Schemas.file));
 		}
 
 		const result: ExtensionHostProcessManager[] = [];
 
-		const extHostProcessWorker = this._instantiationService.createInstance(ExtensionHostProcessWorker, autoStart, extensions, this._extensionHostLogsLocation);
-		const extHostProcessManager = this._instantiationService.createInstance(ExtensionHostProcessManager, true, extHostProcessWorker, null, initialActivationEvents);
-		result.push(extHostProcessManager);
+		//const extHostProcessWorker = this._instantiationService.createInstance(ExtensionHostProcessWorker, autoStart, extensions, this._extensionHostLogsLocation);
+		//const extHostProcessManager = this._instantiationService.createInstance(ExtensionHostProcessManager, true, extHostProcessWorker, null, initialActivationEvents);
+		// result.push(extHostProcessManager);
 
 		const remoteAgentConnection = this._remoteAgentService.getConnection();
 		if (remoteAgentConnection) {
