@@ -6,10 +6,13 @@
 //@ts-check
 'use strict';
 
+console.log("hey!");
+
 const bootstrap = require('./bootstrap');
 
+// ONIVIM: ASAR support not necessary
 // Enable ASAR in our forked processes
-bootstrap.enableASARSupport();
+// bootstrap.enableASARSupport();
 
 if (process.env['VSCODE_INJECT_NODE_MODULE_LOOKUP_PATH']) {
 	bootstrap.injectNodeModuleLookupPath(process.env['VSCODE_INJECT_NODE_MODULE_LOOKUP_PATH']);
@@ -20,10 +23,11 @@ if (!!process.send && process.env.PIPE_LOGGING === 'true') {
 	pipeLoggingToParent();
 }
 
+// ONIVIM: Disable disabling of IO...
 // Disable IO if configured
-if (!process.env['VSCODE_ALLOW_IO']) {
+/*if (!process.env['VSCODE_ALLOW_IO']) {
 	disableSTDIO();
-}
+}*/
 
 // Handle Exceptions
 if (!process.env['VSCODE_HANDLES_UNCAUGHT_ERRORS']) {
@@ -35,8 +39,9 @@ if (process.env['VSCODE_PARENT_PID']) {
 	terminateWhenParentTerminates();
 }
 
+// ONIVIM: Disable crash reporter
 // Configure Crash Reporter
-configureCrashReporter();
+// configureCrashReporter();
 
 // Load AMD entry point
 require('./bootstrap-amd').load(process.env['AMD_ENTRYPOINT']);

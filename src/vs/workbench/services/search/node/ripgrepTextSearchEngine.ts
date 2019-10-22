@@ -10,7 +10,7 @@ import { NodeStringDecoder, StringDecoder } from 'string_decoder';
 import { createRegExp, startsWith, startsWithUTF8BOM, stripUTF8BOM, escapeRegExpCharacters, endsWith } from 'vs/base/common/strings';
 import { URI } from 'vs/base/common/uri';
 import { IExtendedExtensionSearchOptions, SearchError, SearchErrorCode, serializeSearchError } from 'vs/workbench/services/search/common/search';
-import { rgPath } from 'vscode-ripgrep';
+//import { rgPath } from 'vscode-ripgrep';
 import { anchorGlob, createTextSearchResult, IOutputChannel, Maybe } from './ripgrepSearchUtils';
 import { coalesce } from 'vs/base/common/arrays';
 import { splitGlobAware } from 'vs/base/common/glob';
@@ -20,6 +20,7 @@ import { Progress } from 'vs/platform/progress/common/progress';
 import { CancellationToken } from 'vs/base/common/cancellation';
 
 // If vscode-ripgrep is in an .asar file, then the binary is unpacked.
+const rgPath = "";
 const rgDiskPath = rgPath.replace(/\bnode_modules\.asar\b/, 'node_modules.asar.unpacked');
 
 export class RipgrepTextSearchEngine {

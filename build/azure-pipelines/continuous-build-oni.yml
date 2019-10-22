@@ -1,0 +1,20 @@
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: "10.15.1"
+- powershell: |
+    npm install -g yarn@1.13.0
+  displayName: Install yarn
+- powershell: |
+    npm install -g jest@24.5.0
+  displayName: Install jest
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '2.x'
+    addToPath: true
+- powershell: |
+    yarn
+  displayName: Install Dependencies
+- powershell: |
+    yarn compile
+  displayName: Compile Sources
