@@ -93,6 +93,8 @@ export class JsonRpcProtocol {
 		);
 
 		this._connection.onNotification(this._incomingNotification, (payload: any) => {
+			console.error("[exthost] message type: " + payload.type);
+			console.error("[exthost] message type: " + payload.payload);
 			this._onMessage.fire(payload);
 		});
 
@@ -228,7 +230,9 @@ function connectToRenderer(protocol: IExtensionHostProtocol): Promise<IRendererC
 		const first = protocol.onMessage(raw => {
 			first.dispose();
 
-			const initData = <IInitData>JSON.parse(raw.toString());
+			console.error("Received INIT data: " + JSON.stringify(raw.payload));
+			const initData = <IInitData>raw.payload;
+			console.error("init data: " + JSON.stringify(initData));
 
 			const rendererCommit = initData.commit;
 			const myCommit = product.commit;
@@ -295,18 +299,20 @@ function connectToRenderer(protocol: IExtensionHostProtocol): Promise<IRendererC
 			}
 
 			// Tell the outside that we are initialized
+			console.error("[exthost] sending initialized message")
 			protocol.send(createMessageOfType(MessageType.Initialized));
 
 			c({ protocol, initData });
 		});
 
 		// Tell the outside that we are ready to receive messages
+			console.error("[exthost] sending ready message")
 		protocol.send(createMessageOfType(MessageType.Ready));
 	});
 }
 
 export async function startExtensionHostProcess(): Promise<void> {
-	console.error("-- starting exxtension host process");
+	console.error("-- starting extension host process");
 
 	const protocol = await createExtHostProtocol();
 	const renderer = await connectToRenderer(protocol);

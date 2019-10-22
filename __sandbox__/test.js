@@ -17,7 +17,7 @@ let run = async () => {
         },
         stdio: ["pipe", "pipe", "inherit"]
     });
-    
+
     console.log("Creating message connection");
 
     let connection = rpc.createMessageConnection(
@@ -25,11 +25,53 @@ let run = async () => {
         new rpc.StreamMessageWriter(childProcess.stdin)
     );
 
+    let extMessage = new rpc.NotificationType('ext/msg');
+
     let promise = new Promise((c) => {
 
         let testNotification = new rpc.NotificationType('host/msg');
         connection.onNotification(testNotification, (msg) => {
             console.log("INCOMING MESSAGE: " + JSON.stringify(msg));
+
+            if (msg.type == 1) {
+                connection.sendNotification(extMessage, {
+                    type: 0,
+                    reqId: 1,
+                    payload: {
+                        extensions: [],
+                        /*extensions: [{
+                            ...testExtension,
+                            identifier: "lsp-sample",
+                            extensionLocationPath: path.dirname(extensionPath),
+                        }],*/
+                        parentPid: process.pid,
+                        environment: {
+                            globalStorageHomePath: require("os").tmpdir(),
+                        },
+                        workspace: {},
+                        logsLocationPath: require("os").tmpdir(),
+                        autoStart: true,
+                    }
+                });
+
+                connection.sendNotification(extMessage, {
+                    type: 4, /* RequestJSONArgs */
+                    reqId: 2,
+                    payload: ["ExtHostConfiguration", "$initializeConfiguration", [{}]],
+                });
+
+                connection.sendNotification(extMessage, {
+                    type: 4, /* RequestJSONArgs */
+                    reqId: 2,
+                    payload: ["ExtHostWorkspace", "$initializeWorkspace", [{
+                        id: "workspace-test",
+                        name: "workspace-test",
+                        configuration: null,
+                        folders: [],
+                    }]],
+                });
+
+            }
 
             let message = msg;
             if (message.reqId > 0) {
@@ -51,44 +93,6 @@ let run = async () => {
     //let testExtension = JSON.parse(fs.readFileSync(extensionPath));
 
     //testExtension.main = path.join(path.dirname(extensionPath), testExtension.main);
-
-    let extMessage = new rpc.NotificationType('ext/msg');
-    connection.sendNotification(extMessage, {
-        type: 0,
-        reqId: 1,
-        payload: {
-            extensions: [],
-            /*extensions: [{
-                ...testExtension,
-                identifier: "lsp-sample",
-                extensionLocationPath: path.dirname(extensionPath),
-            }],*/
-            parentPid: process.pid,
-            environment: {
-                globalStorageHomePath: require("os").tmpdir(),
-            },
-            workspace: {},
-            logsLocationPath: require("os").tmpdir(),
-            autoStart: true,
-        }
-    });
-
-    connection.sendNotification(extMessage, {
-        type: 4, /* RequestJSONArgs */
-        reqId: 2,
-        payload: ["ExtHostConfiguration", "$initializeConfiguration", [{}]],
-    });
-
-    connection.sendNotification(extMessage, {
-        type: 4, /* RequestJSONArgs */
-        reqId: 2,
-        payload: ["ExtHostWorkspace", "$initializeWorkspace", [{
-            id: "workspace-test",
-            name: "workspace-test",
-            configuration: null,
-            folders: [],
-        }]],
-    });
 
     await promise;
     // setTimeout(() => {
