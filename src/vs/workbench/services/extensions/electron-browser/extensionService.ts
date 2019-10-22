@@ -16,7 +16,7 @@ import { IWorkbenchEnvironmentService } from 'vs/workbench/services/environment/
 import { IExtensionManagementService } from 'vs/platform/extensionManagement/common/extensionManagement';
 import { IExtensionEnablementService } from 'vs/workbench/services/extensionManagement/common/extensionManagement';
 import { IConfigurationService } from 'vs/platform/configuration/common/configuration';
-import { IInitDataProvider, RemoteExtensionHostClient } from 'vs/workbench/services/extensions/common/remoteExtensionHostClient';
+//import { IInitDataProvider, RemoteExtensionHostClient } from 'vs/workbench/services/extensions/common/remoteExtensionHostClient';
 import { IRemoteAgentService } from 'vs/workbench/services/remote/common/remoteAgentService';
 import { IRemoteAuthorityResolverService, RemoteAuthorityResolverError, ResolverResult } from 'vs/platform/remote/common/remoteAuthorityResolver';
 import { isUIExtension as isUIExtensionFunc } from 'vs/workbench/services/extensions/common/extensionsUtil';
@@ -332,7 +332,7 @@ export class ExtensionService extends AbstractExtensionService implements IExten
 
 	//#endregion
 
-	private _createProvider(remoteAuthority: string): IInitDataProvider {
+	/*private _createProvider(remoteAuthority: string): IInitDataProvider {
 		return {
 			remoteAuthority: remoteAuthority,
 			getInitData: () => {
@@ -341,7 +341,7 @@ export class ExtensionService extends AbstractExtensionService implements IExten
 				});
 			}
 		};
-	}
+	}*/
 
 	protected _createExtensionHosts(isInitialStart: boolean, initialActivationEvents: string[]): ExtensionHostProcessManager[] {
 		//let autoStart: boolean;
@@ -363,9 +363,9 @@ export class ExtensionService extends AbstractExtensionService implements IExten
 
 		const remoteAgentConnection = this._remoteAgentService.getConnection();
 		if (remoteAgentConnection) {
-			const remoteExtHostProcessWorker = this._instantiationService.createInstance(RemoteExtensionHostClient, this.getExtensions(), this._createProvider(remoteAgentConnection.remoteAuthority), this._remoteAgentService.socketFactory);
-			const remoteExtHostProcessManager = this._instantiationService.createInstance(ExtensionHostProcessManager, false, remoteExtHostProcessWorker, remoteAgentConnection.remoteAuthority, initialActivationEvents);
-			result.push(remoteExtHostProcessManager);
+			//const remoteExtHostProcessWorker = this._instantiationService.createInstance(RemoteExtensionHostClient, this.getExtensions(), this._createProvider(remoteAgentConnection.remoteAuthority), this._remoteAgentService.socketFactory);
+			//const remoteExtHostProcessManager = this._instantiationService.createInstance(ExtensionHostProcessManager, false, remoteExtHostProcessWorker, remoteAgentConnection.remoteAuthority, initialActivationEvents);
+			//result.push(remoteExtHostProcessManager);
 		}
 
 		return result;
