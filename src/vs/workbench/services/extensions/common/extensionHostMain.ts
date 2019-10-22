@@ -52,12 +52,14 @@ export class ExtensionHostMain {
 		// ensure URIs are transformed and revived
 		//initData = ExtensionHostMain._transform(initData, rpcProtocol);
 
+		console.error("[exthost] extensionHostMain - 1");
 		// bootstrap services
 		const services = new ServiceCollection(...getSingletonServiceDescriptors());
 		services.set(IExtHostInitDataService, { _serviceBrand: undefined, ...initData });
 		services.set(IExtHostRpcService, new ExtHostRpcService(rpcProtocol));
 		services.set(IURITransformerService, new URITransformerService(uriTransformer));
 		services.set(IHostUtils, hostUtils);
+		console.error("[exthost] extensionHostMain - 2");
 
 		const instaService: IInstantiationService = new InstantiationService(services, true);
 

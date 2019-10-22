@@ -99,6 +99,7 @@ export class JsonRPCProtocol extends Disposable implements IRPCProtocol {
 
 	constructor(protocol: IExtensionHostProtocol) {
 		super();
+		console.error("[exthost] JsonRPCProtocol constructor");
 		this._protocol = protocol;
 		this._isDisposed = false;
 		this._locals = [];
@@ -216,12 +217,15 @@ export class JsonRPCProtocol extends Disposable implements IRPCProtocol {
 	}
 
 	private _receiveOneMessage(rawmsg: IncomingMessage): void {
+		console.error("_receiveOneMessage")
 		if (this._isDisposed) {
 			return;
 		}
 
 		const { type, reqId, payload } = rawmsg;
 		const req = reqId;
+
+		console.error(`[exthost] _receiveOneMessage - type: ${type} payload: ${JSON.stringify(payload)}`)
 
 		switch (type) {
 			case MessageType.RequestJSONArgs:
@@ -270,6 +274,7 @@ export class JsonRPCProtocol extends Disposable implements IRPCProtocol {
 		const callId = String(req);
 		const rpcId = getNumberIdentifierForProxy(rpc);
 
+		console.error("[exthost] JsonRPCProtocol - _receiveRequest start");
 		let promise: Promise<any>;
 		let cancel: () => void;
 		if (usesCancellationToken) {
@@ -286,11 +291,13 @@ export class JsonRPCProtocol extends Disposable implements IRPCProtocol {
 		this._cancelInvokedHandlers[callId] = cancel;
 
 		// Acknowledge the request
+		console.error(`[exthost] JsonRPCProtocol - _receiveRequest send ack: ${req}`);
 		this._protocol.send({
 			type: MessageType.Acknowledged,
 			reqId: req,
 			payload: null,
 		});
+		console.error(`[exthost] JsonRPCProtocol - ack sent`);
 
 		promise.then((r) => {
 			delete this._cancelInvokedHandlers[callId];
@@ -356,6 +363,7 @@ export class JsonRPCProtocol extends Disposable implements IRPCProtocol {
 	}
 
 	private _doInvokeHandler(rpcId: number, methodName: string, args: any[]): any {
+		console.error(`Invoke handler: ${rpcId}`);
 		const actor = this._locals[rpcId];
 		if (!actor) {
 			throw new Error('Unknown actor ' + getStringIdentifierForProxy(rpcId));

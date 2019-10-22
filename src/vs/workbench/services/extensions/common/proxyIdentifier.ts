@@ -55,5 +55,5 @@ export function getStringIdentifierForProxy(nid: number): string {
 }
 
 export function getNumberIdentifierForProxy(nid: number): number {
-	return identifiers[nid].nid;
+	return nid;
 }

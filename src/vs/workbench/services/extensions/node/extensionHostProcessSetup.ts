@@ -60,15 +60,23 @@ function patchProcess(allowExit: boolean) {
 			nativeExit(code);
 		} else {
 			const err = new Error('An extension called process.exit() and this was prevented.');
-			console.warn(err.stack);
+			console.error(err.stack);
 		}
 	} as (code?: number) => never;
 
 	// override Electron's process.crash() method
 	process.crash = function () {
 		const err = new Error('An extension called process.crash() and this was prevented.');
-		console.warn(err.stack);
+		console.error(err.stack);
 	};
+
+	console.log = function (msg: string) {
+		console.error(msg)
+	}
+
+	console.warn = function (msg: string) {
+		console.error(msg)
+	}
 }
 
 interface IRendererConnection {
@@ -255,11 +263,11 @@ function connectToRenderer(protocol: IExtensionHostProtocol): Promise<IRendererC
 					if (idx >= 0) {
 						promise.catch(e => {
 							unhandledPromises.splice(idx, 1);
-							console.warn(`rejected promise not handled within 1 second: ${e}`);
+							console.error(`rejected promise not handled within 1 second: ${e}`);
 							if (e && e.stack) {
-								console.warn(`stack trace: ${e.stack}`);
+								console.error(`stack trace: ${e.stack}`);
 							}
-							onUnexpectedError(reason);
+							console.error(reason);
 						});
 					}
 				}, 1000);
@@ -274,7 +282,8 @@ function connectToRenderer(protocol: IExtensionHostProtocol): Promise<IRendererC
 
 			// Print a console message when an exception isn't handled.
 			process.on('uncaughtException', function (err: Error) {
-				onUnexpectedError(err);
+				console.error(err);
+				//onUnexpectedError(err);
 			});
 
 			// Kill oneself if one's parent dies. Much drama.
@@ -317,9 +326,12 @@ export async function startExtensionHostProcess(): Promise<void> {
 	const protocol = await createExtHostProtocol();
 	const renderer = await connectToRenderer(protocol);
 	const { initData } = renderer;
+
+	console.error("[exthost] - startExtensionHostProcess - got initData")
 	// setup things
 	patchProcess(!!initData.environment.extensionTestsLocationURI); // to support other test frameworks like Jasmin that use process.exit (https://github.com/Microsoft/vscode/issues/37708)
 
+	console.error("[exthost] - process PATCHED")
 	// host abstraction
 	const hostUtils = new class NodeHost implements IHostUtils {
 		_serviceBrand: undefined;
@@ -330,7 +342,7 @@ export async function startExtensionHostProcess(): Promise<void> {
 
 	// Attempt to load uri transformer
 	let uriTransformer: IURITransformer | null = null;
-	if (initData.remote.authority && args.uriTransformerPath) {
+	if (initData.remote && initData.remote.authority && args.uriTransformerPath) {
 		try {
 			const rawURITransformerFactory = <any>require.__$__nodeRequire(args.uriTransformerPath);
 			const rawURITransformer = <IRawURITransformer>rawURITransformerFactory(initData.remote.authority);
@@ -340,6 +352,7 @@ export async function startExtensionHostProcess(): Promise<void> {
 		}
 	}
 
+	console.error("[exthost] - creating ExtensionHostMain")
 	const extensionHostMain = new ExtensionHostMain(
 		renderer.protocol,
 		initData,
@@ -349,4 +362,5 @@ export async function startExtensionHostProcess(): Promise<void> {
 
 	// rewrite onTerminate-function to be a proper shutdown
 	onTerminate = () => extensionHostMain.terminate();
+
 }
