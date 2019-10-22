@@ -4,24 +4,24 @@
  *--------------------------------------------------------------------------------------------*/
 
 import * as nativeWatchdog from 'native-watchdog';
-import * as net from 'net';
+/// import * as net from 'net';
 import * as minimist from 'vscode-minimist';
 import { onUnexpectedError } from 'vs/base/common/errors';
 import { Emitter, Event } from 'vs/base/common/event';
-import { IMessagePassingProtocol } from 'vs/base/parts/ipc/common/ipc';
-import { PersistentProtocol, ProtocolConstants, BufferedEmitter } from 'vs/base/parts/ipc/common/ipc.net';
-import { NodeSocket, WebSocketNodeSocket } from 'vs/base/parts/ipc/node/ipc.net';
+// import { IMessagePassingProtocol } from 'vs/base/parts/ipc/common/ipc';
+import { /*PersistentProtocol, ProtocolConstants, */BufferedEmitter } from 'vs/base/parts/ipc/common/ipc.net';
+//import { NodeSocket, WebSocketNodeSocket } from 'vs/base/parts/ipc/node/ipc.net';
 import product from 'vs/platform/product/common/product';
 import { IInitData } from 'vs/workbench/api/common/extHost.protocol';
-import { MessageType, createMessageOfType, isMessageOfType, IExtHostSocketMessage, IExtHostReadyMessage, IExtHostReduceGraceTimeMessage } from 'vs/workbench/services/extensions/common/extensionHostProtocol';
+import { MessageType, createMessageOfType, isMessageOfType, IExtensionHostProtocol, /*IExtHostSocketMessage, IExtHostReadyMessage, IExtHostReduceGraceTimeMessage,*/ IncomingMessage, OutgoingMessage } from 'vs/workbench/services/extensions/common/extensionHostProtocol';
 import { ExtensionHostMain, IExitFn } from 'vs/workbench/services/extensions/common/extensionHostMain';
-import { VSBuffer } from 'vs/base/common/buffer';
+//import { VSBuffer } from 'vs/base/common/buffer';
 import { IURITransformer, URITransformer, IRawURITransformer } from 'vs/base/common/uriIpc';
 import { exists } from 'vs/base/node/pfs';
 import { realpath } from 'vs/base/node/extpath';
 import { IHostUtils } from 'vs/workbench/api/common/extHostExtensionService';
 import 'vs/workbench/api/node/extHost.services';
-import { RunOnceScheduler } from 'vs/base/common/async';
+//import { RunOnceScheduler } from 'vs/base/common/async';
 import * as rpc from "vscode-jsonrpc";
 
 interface ParsedExtHostArgs {
@@ -72,7 +72,7 @@ function patchProcess(allowExit: boolean) {
 }
 
 interface IRendererConnection {
-	protocol: IMessagePassingProtocol;
+	protocol: IExtensionHostProtocol;
 	initData: IInitData;
 }
 
@@ -110,7 +110,7 @@ let onTerminate = function () {
 	nativeExit();
 };
 
-function _createExtHostProtocol(): Promise<IMessagePassingProtocol> {
+/*function _createExtHostProtocol(): Promise<IMessagePassingProtocol> {
 	if (process.env.VSCODE_EXTHOST_WILL_SEND_SOCKET) {
 
 		return new Promise<IMessagePassingProtocol>((resolve, reject) => {
@@ -187,16 +187,16 @@ function _createExtHostProtocol(): Promise<IMessagePassingProtocol> {
 
 		});
 	}
-}
+}*/
 
-async function createExtHostProtocol(): Promise<IMessagePassingProtocol> {
+async function createExtHostProtocol(): Promise<IExtensionHostProtocol> {
 
-	const protocol = await _createExtHostProtocol();
+	const protocol = new JsonRpcProtocol();
 
-	return new class implements IMessagePassingProtocol {
+	return new class implements IExtensionHostProtocol {
 
-		private readonly _onMessage = new BufferedEmitter<VSBuffer>();
-		readonly onMessage: Event<VSBuffer> = this._onMessage.event;
+		private readonly _onMessage = new BufferedEmitter<IncomingMessage>();
+		readonly onMessage: Event<IncomingMessage> = this._onMessage.event;
 
 		private _terminating: boolean;
 
@@ -204,6 +204,7 @@ async function createExtHostProtocol(): Promise<IMessagePassingProtocol> {
 			this._terminating = false;
 			protocol.onMessage((msg) => {
 				if (isMessageOfType(msg, MessageType.Terminate)) {
+					console.error("Received termination message");
 					this._terminating = true;
 					onTerminate();
 				} else {
@@ -220,7 +221,7 @@ async function createExtHostProtocol(): Promise<IMessagePassingProtocol> {
 	};
 }
 
-function connectToRenderer(protocol: IMessagePassingProtocol): Promise<IRendererConnection> {
+function connectToRenderer(protocol: IExtensionHostProtocol): Promise<IRendererConnection> {
 	return new Promise<IRendererConnection>((c) => {
 
 		// Listen init data message

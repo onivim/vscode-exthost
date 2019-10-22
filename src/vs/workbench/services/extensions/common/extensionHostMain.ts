@@ -6,11 +6,11 @@
 import { timeout } from 'vs/base/common/async';
 import * as errors from 'vs/base/common/errors';
 import { DisposableStore } from 'vs/base/common/lifecycle';
-import { URI } from 'vs/base/common/uri';
+// import { URI } from 'vs/base/common/uri';
 import { IURITransformer } from 'vs/base/common/uriIpc';
-import { IMessagePassingProtocol } from 'vs/base/parts/ipc/common/ipc';
+//import { IMessagePassingProtocol } from 'vs/base/parts/ipc/common/ipc';
 import { IInitData, MainContext, MainThreadConsoleShape } from 'vs/workbench/api/common/extHost.protocol';
-import { RPCProtocol } from 'vs/workbench/services/extensions/common/rpcProtocol';
+// import { RPCProtocol } from 'vs/workbench/services/extensions/common/rpcProtocol';
 import { IExtensionDescription } from 'vs/platform/extensions/common/extensions';
 import { ILogService } from 'vs/platform/log/common/log';
 import { getSingletonServiceDescriptors } from 'vs/platform/instantiation/common/extensions';
@@ -21,6 +21,8 @@ import { IInstantiationService } from 'vs/platform/instantiation/common/instanti
 import { IExtHostRpcService, ExtHostRpcService } from 'vs/workbench/api/common/extHostRpcService';
 import { IURITransformerService, URITransformerService } from 'vs/workbench/api/common/extHostUriTransformerService';
 import { IExtHostExtensionService, IHostUtils } from 'vs/workbench/api/common/extHostExtensionService';
+import { JsonRPCProtocol, IExtensionHostProtocol } from 'vs/workbench/services/extensions/common/extensionHostProtocol';
+// import { IRPCProtocol } from 'vs/workbench/services/extensions/common/proxyIdentifier';
 
 export interface IExitFn {
 	(code?: number): any;
@@ -38,17 +40,17 @@ export class ExtensionHostMain {
 	private readonly _disposables = new DisposableStore();
 
 	constructor(
-		protocol: IMessagePassingProtocol,
+		protocol: IExtensionHostProtocol,
 		initData: IInitData,
 		hostUtils: IHostUtils,
 		uriTransformer: IURITransformer | null
 	) {
 		this._isTerminating = false;
 		this._hostUtils = hostUtils;
-		const rpcProtocol = new RPCProtocol(protocol, null, uriTransformer);
+		const rpcProtocol = new JsonRPCProtocol(protocol);
 
 		// ensure URIs are transformed and revived
-		initData = ExtensionHostMain._transform(initData, rpcProtocol);
+		//initData = ExtensionHostMain._transform(initData, rpcProtocol);
 
 		// bootstrap services
 		const services = new ServiceCollection(...getSingletonServiceDescriptors());
@@ -129,7 +131,7 @@ export class ExtensionHostMain {
 		}, 1000);
 	}
 
-	private static _transform(initData: IInitData, rpcProtocol: RPCProtocol): IInitData {
+/*	private static _transform(initData: IInitData, rpcProtocol: RPCProtocol): IInitData {
 		initData.extensions.forEach((ext) => (<any>ext).extensionLocation = URI.revive(rpcProtocol.transformIncomingURIs(ext.extensionLocation)));
 		initData.environment.appRoot = URI.revive(rpcProtocol.transformIncomingURIs(initData.environment.appRoot));
 		initData.environment.appSettingsHome = URI.revive(rpcProtocol.transformIncomingURIs(initData.environment.appSettingsHome));
@@ -143,5 +145,5 @@ export class ExtensionHostMain {
 		initData.logsLocation = URI.revive(rpcProtocol.transformIncomingURIs(initData.logsLocation));
 		initData.workspace = rpcProtocol.transformIncomingURIs(initData.workspace);
 		return initData;
-	}
+	}*/
 }
