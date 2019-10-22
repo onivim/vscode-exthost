@@ -8,17 +8,17 @@ import { Emitter, Event } from 'vs/base/common/event';
 import { DisposableStore, toDisposable } from 'vs/base/common/lifecycle';
 import { IMessagePassingProtocol } from 'vs/base/parts/ipc/common/ipc';
 import { VSBuffer } from 'vs/base/common/buffer';
-import { createMessageOfType, MessageType, isMessageOfType } from 'vs/workbench/services/extensions/common/extensionHostProtocol';
-import { IInitData, UIKind } from 'vs/workbench/api/common/extHost.protocol';
-import { IWorkspaceContextService, WorkbenchState } from 'vs/platform/workspace/common/workspace';
-import { ILabelService } from 'vs/platform/label/common/label';
-import { ILogService } from 'vs/platform/log/common/log';
-import { IExtensionDescription } from 'vs/platform/extensions/common/extensions';
-import * as platform from 'vs/base/common/platform';
-import { URI } from 'vs/base/common/uri';
+//import { createMessageOfType, MessageType, isMessageOfType } from 'vs/workbench/services/extensions/common/extensionHostProtocol';
+//import { IInitData, UIKind } from 'vs/workbench/api/common/extHost.protocol';
+//import { IWorkspaceContextService, /*WorkbenchState*/ } from 'vs/platform/workspace/common/workspace';
+//import { ILabelService } from 'vs/platform/label/common/label';
+//import { ILogService } from 'vs/platform/log/common/log';
+// import { IExtensionDescription } from 'vs/platform/extensions/common/extensions';
+//import * as platform from 'vs/base/common/platform';
+//import { URI } from 'vs/base/common/uri';
 import { IExtensionHostStarter } from 'vs/workbench/services/extensions/common/extensions';
-import { IProductService } from 'vs/platform/product/common/productService';
-import { IWorkbenchEnvironmentService } from 'vs/workbench/services/environment/common/environmentService';
+//import { IProductService } from 'vs/platform/product/common/productService';
+//import { IWorkbenchEnvironmentService } from 'vs/workbench/services/environment/common/environmentService';
 
 export class WebWorkerExtensionHostStarter implements IExtensionHostStarter {
 
@@ -30,14 +30,14 @@ export class WebWorkerExtensionHostStarter implements IExtensionHostStarter {
 	readonly onExit: Event<[number, string | null]> = this._onDidExit.event;
 
 	constructor(
-		private readonly _autoStart: boolean,
-		private readonly _extensions: Promise<IExtensionDescription[]>,
-		private readonly _extensionHostLogsLocation: URI,
-		@IWorkspaceContextService private readonly _contextService: IWorkspaceContextService,
-		@ILabelService private readonly _labelService: ILabelService,
-		@ILogService private readonly _logService: ILogService,
-		@IWorkbenchEnvironmentService private readonly _environmentService: IWorkbenchEnvironmentService,
-		@IProductService private readonly _productService: IProductService,
+		//private readonly _autoStart: boolean,
+		//private readonly _extensions: Promise<IExtensionDescription[]>,
+		//private readonly _extensionHostLogsLocation: URI,
+		//@IWorkspaceContextService private readonly _contextService: IWorkspaceContextService,
+		//@ILabelService private readonly _labelService: ILabelService,
+		//@ILogService private readonly _logService: ILogService,
+		//@IWorkbenchEnvironmentService private readonly _environmentService: IWorkbenchEnvironmentService,
+		//@IProductService private readonly _productService: IProductService,
 	) {
 
 	}
@@ -84,9 +84,9 @@ export class WebWorkerExtensionHostStarter implements IExtensionHostStarter {
 			// (2) ==> send: init data
 			// (3) <== wait for: Initialized
 
-			await Event.toPromise(Event.filter(protocol.onMessage, msg => isMessageOfType(msg, MessageType.Ready)));
-			protocol.send(VSBuffer.fromString(JSON.stringify(await this._createExtHostInitData())));
-			await Event.toPromise(Event.filter(protocol.onMessage, msg => isMessageOfType(msg, MessageType.Initialized)));
+			//await Event.toPromise(Event.filter(protocol.onMessage, msg => isMessageOfType(msg, MessageType.Ready)));
+			//protocol.send(VSBuffer.fromString(JSON.stringify(await this._createExtHostInitData())));
+			//await Event.toPromise(Event.filter(protocol.onMessage, msg => isMessageOfType(msg, MessageType.Initialized)));
 
 			this._protocol = protocol;
 		}
@@ -103,7 +103,7 @@ export class WebWorkerExtensionHostStarter implements IExtensionHostStarter {
 			return;
 		}
 		this._isTerminating = true;
-		this._protocol.send(createMessageOfType(MessageType.Terminate));
+		//this._protocol.send(createMessageOfType(MessageType.Terminate));
 		setTimeout(() => this._toDispose.dispose(), 10 * 1000);
 	}
 
@@ -115,7 +115,7 @@ export class WebWorkerExtensionHostStarter implements IExtensionHostStarter {
 		return Promise.resolve(false);
 	}
 
-	private async _createExtHostInitData(): Promise<IInitData> {
+	/*private async _createExtHostInitData(): Promise<IInitData> {
 		const extensionDescriptions = await this._extensions;
 		const workspace = this._contextService.getWorkspace();
 		return {
@@ -154,5 +154,5 @@ export class WebWorkerExtensionHostStarter implements IExtensionHostStarter {
 			},
 			uiKind: platform.isWeb ? UIKind.Web : UIKind.Desktop
 		};
-	}
+	}*/
 }
