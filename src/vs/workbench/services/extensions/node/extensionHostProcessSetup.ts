@@ -4,24 +4,25 @@
  *--------------------------------------------------------------------------------------------*/
 
 import * as nativeWatchdog from 'native-watchdog';
-import * as net from 'net';
+/// import * as net from 'net';
 import * as minimist from 'vscode-minimist';
 import { onUnexpectedError } from 'vs/base/common/errors';
-import { Event } from 'vs/base/common/event';
-import { IMessagePassingProtocol } from 'vs/base/parts/ipc/common/ipc';
-import { PersistentProtocol, ProtocolConstants, BufferedEmitter } from 'vs/base/parts/ipc/common/ipc.net';
-import { NodeSocket, WebSocketNodeSocket } from 'vs/base/parts/ipc/node/ipc.net';
+import { Emitter, Event } from 'vs/base/common/event';
+// import { IMessagePassingProtocol } from 'vs/base/parts/ipc/common/ipc';
+import { /*PersistentProtocol, ProtocolConstants, */BufferedEmitter } from 'vs/base/parts/ipc/common/ipc.net';
+//import { NodeSocket, WebSocketNodeSocket } from 'vs/base/parts/ipc/node/ipc.net';
 import product from 'vs/platform/product/common/product';
 import { IInitData } from 'vs/workbench/api/common/extHost.protocol';
-import { MessageType, createMessageOfType, isMessageOfType, IExtHostSocketMessage, IExtHostReadyMessage, IExtHostReduceGraceTimeMessage } from 'vs/workbench/services/extensions/common/extensionHostProtocol';
+import { MessageType, createMessageOfType, isMessageOfType, IExtensionHostProtocol, /*IExtHostSocketMessage, IExtHostReadyMessage, IExtHostReduceGraceTimeMessage,*/ IncomingMessage, OutgoingMessage } from 'vs/workbench/services/extensions/common/extensionHostProtocol';
 import { ExtensionHostMain, IExitFn } from 'vs/workbench/services/extensions/common/extensionHostMain';
-import { VSBuffer } from 'vs/base/common/buffer';
+//import { VSBuffer } from 'vs/base/common/buffer';
 import { IURITransformer, URITransformer, IRawURITransformer } from 'vs/base/common/uriIpc';
 import { exists } from 'vs/base/node/pfs';
 import { realpath } from 'vs/base/node/extpath';
 import { IHostUtils } from 'vs/workbench/api/common/extHostExtensionService';
 import 'vs/workbench/api/node/extHost.services';
-import { RunOnceScheduler } from 'vs/base/common/async';
+//import { RunOnceScheduler } from 'vs/base/common/async';
+import * as rpc from "vscode-jsonrpc";
 
 interface ParsedExtHostArgs {
 	uriTransformerPath?: string;
@@ -59,20 +60,58 @@ function patchProcess(allowExit: boolean) {
 			nativeExit(code);
 		} else {
 			const err = new Error('An extension called process.exit() and this was prevented.');
-			console.warn(err.stack);
+			console.error(err.stack);
 		}
 	} as (code?: number) => never;
 
 	// override Electron's process.crash() method
 	process.crash = function () {
 		const err = new Error('An extension called process.crash() and this was prevented.');
-		console.warn(err.stack);
+		console.error(err.stack);
 	};
+
+	console.log = function (msg: string) {
+		console.error(msg)
+	}
+
+	console.warn = function (msg: string) {
+		console.error(msg)
+	}
 }
 
 interface IRendererConnection {
-	protocol: IMessagePassingProtocol;
+	protocol: IExtensionHostProtocol;
 	initData: IInitData;
+}
+
+export class JsonRpcProtocol {
+
+	private _connection: rpc.MessageConnection;
+
+	private _hostNotification = new rpc.NotificationType<any, any>("host/msg");
+	private _incomingNotification = new rpc.NotificationType<any, any>("ext/msg");
+
+	private _onMessage = new Emitter<IncomingMessage>();
+	readonly onMessage: Event<IncomingMessage> = this._onMessage.event;
+
+	constructor() {
+		this._connection = rpc.createMessageConnection(
+			new rpc.StreamMessageReader(process.stdin),
+			new rpc.StreamMessageWriter(process.stdout),
+		);
+
+		this._connection.onNotification(this._incomingNotification, (payload: any) => {
+			console.error("[exthost] message type: " + payload.type);
+			console.error("[exthost] message type: " + payload.payload);
+			this._onMessage.fire(payload);
+		});
+
+		this._connection.listen();
+	}
+
+	public send(msg: OutgoingMessage) {
+		this._connection.sendNotification(this._hostNotification, msg);
+	}
 }
 
 // This calls exit directly in case the initialization is not finished and we need to exit
@@ -81,7 +120,7 @@ let onTerminate = function () {
 	nativeExit();
 };
 
-function _createExtHostProtocol(): Promise<IMessagePassingProtocol> {
+/*function _createExtHostProtocol(): Promise<IMessagePassingProtocol> {
 	if (process.env.VSCODE_EXTHOST_WILL_SEND_SOCKET) {
 
 		return new Promise<IMessagePassingProtocol>((resolve, reject) => {
@@ -158,16 +197,16 @@ function _createExtHostProtocol(): Promise<IMessagePassingProtocol> {
 
 		});
 	}
-}
+}*/
 
-async function createExtHostProtocol(): Promise<IMessagePassingProtocol> {
+async function createExtHostProtocol(): Promise<IExtensionHostProtocol> {
 
-	const protocol = await _createExtHostProtocol();
+	const protocol = new JsonRpcProtocol();
 
-	return new class implements IMessagePassingProtocol {
+	return new class implements IExtensionHostProtocol {
 
-		private readonly _onMessage = new BufferedEmitter<VSBuffer>();
-		readonly onMessage: Event<VSBuffer> = this._onMessage.event;
+		private readonly _onMessage = new BufferedEmitter<IncomingMessage>();
+		readonly onMessage: Event<IncomingMessage> = this._onMessage.event;
 
 		private _terminating: boolean;
 
@@ -175,6 +214,7 @@ async function createExtHostProtocol(): Promise<IMessagePassingProtocol> {
 			this._terminating = false;
 			protocol.onMessage((msg) => {
 				if (isMessageOfType(msg, MessageType.Terminate)) {
+					console.error("Received termination message");
 					this._terminating = true;
 					onTerminate();
 				} else {
@@ -191,14 +231,16 @@ async function createExtHostProtocol(): Promise<IMessagePassingProtocol> {
 	};
 }
 
-function connectToRenderer(protocol: IMessagePassingProtocol): Promise<IRendererConnection> {
+function connectToRenderer(protocol: IExtensionHostProtocol): Promise<IRendererConnection> {
 	return new Promise<IRendererConnection>((c) => {
 
 		// Listen init data message
 		const first = protocol.onMessage(raw => {
 			first.dispose();
 
-			const initData = <IInitData>JSON.parse(raw.toString());
+			console.error("Received INIT data: " + JSON.stringify(raw.payload));
+			const initData = <IInitData>raw.payload;
+			console.error("init data: " + JSON.stringify(initData));
 
 			const rendererCommit = initData.commit;
 			const myCommit = product.commit;
@@ -221,11 +263,11 @@ function connectToRenderer(protocol: IMessagePassingProtocol): Promise<IRenderer
 					if (idx >= 0) {
 						promise.catch(e => {
 							unhandledPromises.splice(idx, 1);
-							console.warn(`rejected promise not handled within 1 second: ${e}`);
+							console.error(`rejected promise not handled within 1 second: ${e}`);
 							if (e && e.stack) {
-								console.warn(`stack trace: ${e.stack}`);
+								console.error(`stack trace: ${e.stack}`);
 							}
-							onUnexpectedError(reason);
+							console.error(reason);
 						});
 					}
 				}, 1000);
@@ -240,7 +282,8 @@ function connectToRenderer(protocol: IMessagePassingProtocol): Promise<IRenderer
 
 			// Print a console message when an exception isn't handled.
 			process.on('uncaughtException', function (err: Error) {
-				onUnexpectedError(err);
+				console.error(err);
+				//onUnexpectedError(err);
 			});
 
 			// Kill oneself if one's parent dies. Much drama.
@@ -265,24 +308,30 @@ function connectToRenderer(protocol: IMessagePassingProtocol): Promise<IRenderer
 			}
 
 			// Tell the outside that we are initialized
+			console.error("[exthost] sending initialized message")
 			protocol.send(createMessageOfType(MessageType.Initialized));
 
 			c({ protocol, initData });
 		});
 
 		// Tell the outside that we are ready to receive messages
+			console.error("[exthost] sending ready message")
 		protocol.send(createMessageOfType(MessageType.Ready));
 	});
 }
 
 export async function startExtensionHostProcess(): Promise<void> {
+	console.error("-- starting extension host process");
 
 	const protocol = await createExtHostProtocol();
 	const renderer = await connectToRenderer(protocol);
 	const { initData } = renderer;
+
+	console.error("[exthost] - startExtensionHostProcess - got initData")
 	// setup things
 	patchProcess(!!initData.environment.extensionTestsLocationURI); // to support other test frameworks like Jasmin that use process.exit (https://github.com/Microsoft/vscode/issues/37708)
 
+	console.error("[exthost] - process PATCHED")
 	// host abstraction
 	const hostUtils = new class NodeHost implements IHostUtils {
 		_serviceBrand: undefined;
@@ -293,7 +342,7 @@ export async function startExtensionHostProcess(): Promise<void> {
 
 	// Attempt to load uri transformer
 	let uriTransformer: IURITransformer | null = null;
-	if (initData.remote.authority && args.uriTransformerPath) {
+	if (initData.remote && initData.remote.authority && args.uriTransformerPath) {
 		try {
 			const rawURITransformerFactory = <any>require.__$__nodeRequire(args.uriTransformerPath);
 			const rawURITransformer = <IRawURITransformer>rawURITransformerFactory(initData.remote.authority);
@@ -303,6 +352,7 @@ export async function startExtensionHostProcess(): Promise<void> {
 		}
 	}
 
+	console.error("[exthost] - creating ExtensionHostMain")
 	const extensionHostMain = new ExtensionHostMain(
 		renderer.protocol,
 		initData,
@@ -312,4 +362,5 @@ export async function startExtensionHostProcess(): Promise<void> {
 
 	// rewrite onTerminate-function to be a proper shutdown
 	onTerminate = () => extensionHostMain.terminate();
+
 }

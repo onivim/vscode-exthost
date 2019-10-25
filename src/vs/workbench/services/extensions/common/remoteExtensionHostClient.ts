@@ -4,29 +4,29 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { Emitter, Event } from 'vs/base/common/event';
-import { IMessagePassingProtocol } from 'vs/base/parts/ipc/common/ipc';
-import { IWorkbenchEnvironmentService } from 'vs/workbench/services/environment/common/environmentService';
-import { ILabelService } from 'vs/platform/label/common/label';
-import { ILogService } from 'vs/platform/log/common/log';
-import { connectRemoteAgentExtensionHost, IRemoteExtensionHostStartParams, IConnectionOptions, ISocketFactory } from 'vs/platform/remote/common/remoteAgentConnection';
-import { ITelemetryService } from 'vs/platform/telemetry/common/telemetry';
-import { IWorkspaceContextService, WorkbenchState } from 'vs/platform/workspace/common/workspace';
-import { IInitData, UIKind } from 'vs/workbench/api/common/extHost.protocol';
-import { MessageType, createMessageOfType, isMessageOfType } from 'vs/workbench/services/extensions/common/extensionHostProtocol';
+import { IMessagePassingProtocol, NoopMessagePassingProtocol } from 'vs/base/parts/ipc/common/ipc';
+// import { IWorkbenchEnvironmentService } from 'vs/workbench/services/environment/common/environmentService';
+// import { ILabelService } from 'vs/platform/label/common/label';
+// import { ILogService } from 'vs/platform/log/common/log';
+// import { connectRemoteAgentExtensionHost, IRemoteExtensionHostStartParams, IConnectionOptions, ISocketFactory } from 'vs/platform/remote/common/remoteAgentConnection';
+// import { ITelemetryService } from 'vs/platform/telemetry/common/telemetry';
+// import { IWorkspaceContextService, WorkbenchState } from 'vs/platform/workspace/common/workspace';
+// import { IInitData, UIKind } from 'vs/workbench/api/common/extHost.protocol';
+// import { MessageType, createMessageOfType, isMessageOfType } from 'vs/workbench/services/extensions/common/extensionHostProtocol';
 import { IExtensionHostStarter } from 'vs/workbench/services/extensions/common/extensions';
-import { parseExtensionDevOptions } from 'vs/workbench/services/extensions/common/extensionDevOptions';
+// import { parseExtensionDevOptions } from 'vs/workbench/services/extensions/common/extensionDevOptions';
 import { IRemoteAgentEnvironment } from 'vs/platform/remote/common/remoteAgentEnvironment';
 import { IRemoteAuthorityResolverService } from 'vs/platform/remote/common/remoteAuthorityResolver';
-import * as platform from 'vs/base/common/platform';
-import { Schemas } from 'vs/base/common/network';
+// import * as platform from 'vs/base/common/platform';
+// import { Schemas } from 'vs/base/common/network';
 import { Disposable } from 'vs/base/common/lifecycle';
 import { ILifecycleService } from 'vs/platform/lifecycle/common/lifecycle';
 import { PersistentProtocol } from 'vs/base/parts/ipc/common/ipc.net';
-import { IExtensionDescription } from 'vs/platform/extensions/common/extensions';
-import { VSBuffer } from 'vs/base/common/buffer';
-import { IExtensionHostDebugService } from 'vs/platform/debug/common/extensionHostDebug';
-import { IProductService } from 'vs/platform/product/common/productService';
-import { ISignService } from 'vs/platform/sign/common/sign';
+// import { IExtensionDescription } from 'vs/platform/extensions/common/extensions';
+// import { VSBuffer } from 'vs/base/common/buffer';
+// import { IExtensionHostDebugService } from 'vs/platform/debug/common/extensionHostDebug';
+// import { IProductService } from 'vs/platform/product/common/productService';
+// import { ISignService } from 'vs/platform/sign/common/sign';
 
 export interface IInitDataProvider {
 	readonly remoteAuthority: string;
@@ -40,37 +40,37 @@ export class RemoteExtensionHostClient extends Disposable implements IExtensionH
 
 	private _protocol: PersistentProtocol | null;
 
-	private readonly _isExtensionDevHost: boolean;
+	//private readonly _isExtensionDevHost: boolean;
 
-	private _terminating: boolean;
+	//private _terminating: boolean;
 
 	constructor(
-		private readonly _allExtensions: Promise<IExtensionDescription[]>,
+		//private readonly _allExtensions: Promise<IExtensionDescription[]>,
 		private readonly _initDataProvider: IInitDataProvider,
-		private readonly _socketFactory: ISocketFactory,
-		@IWorkspaceContextService private readonly _contextService: IWorkspaceContextService,
-		@IWorkbenchEnvironmentService private readonly _environmentService: IWorkbenchEnvironmentService,
-		@ITelemetryService private readonly _telemetryService: ITelemetryService,
+		// private readonly _socketFactory: ISocketFactory,
+		//@IWorkspaceContextService private readonly _contextService: IWorkspaceContextService,
+		// @IWorkbenchEnvironmentService private readonly _environmentService: IWorkbenchEnvironmentService,
+		//@ITelemetryService private readonly _telemetryService: ITelemetryService,
 		@ILifecycleService private readonly _lifecycleService: ILifecycleService,
-		@ILogService private readonly _logService: ILogService,
-		@ILabelService private readonly _labelService: ILabelService,
+		//@ILogService private readonly _logService: ILogService,
+		//@ILabelService private readonly _labelService: ILabelService,
 		@IRemoteAuthorityResolverService private readonly remoteAuthorityResolverService: IRemoteAuthorityResolverService,
-		@IExtensionHostDebugService private readonly _extensionHostDebugService: IExtensionHostDebugService,
-		@IProductService private readonly _productService: IProductService,
-		@ISignService private readonly _signService: ISignService
+		// @IExtensionHostDebugService private readonly _extensionHostDebugService: IExtensionHostDebugService,
+		// @IProductService private readonly _productService: IProductService,
+		//@ISignService private readonly _signService: ISignService
 	) {
 		super();
 		this._protocol = null;
-		this._terminating = false;
+		// this._terminating = false;
 
 		this._register(this._lifecycleService.onShutdown(reason => this.dispose()));
 
-		const devOpts = parseExtensionDevOptions(this._environmentService);
-		this._isExtensionDevHost = devOpts.isExtensionDevHost;
+		// const devOpts = parseExtensionDevOptions(this._environmentService);
+		// this._isExtensionDevHost = devOpts.isExtensionDevHost;
 	}
 
 	public start(): Promise<IMessagePassingProtocol> {
-		const options: IConnectionOptions = {
+		/* const options: IConnectionOptions = {
 			commit: this._productService.commit,
 			socketFactory: this._socketFactory,
 			addressProvider: {
@@ -81,10 +81,11 @@ export class RemoteExtensionHostClient extends Disposable implements IExtensionH
 			},
 			signService: this._signService,
 			logService: this._logService
-		};
+		};*/
 		return this.remoteAuthorityResolverService.resolveAuthority(this._initDataProvider.remoteAuthority).then((resolverResult) => {
+			return new NoopMessagePassingProtocol();
 
-			const startParams: IRemoteExtensionHostStartParams = {
+			/*const startParams: IRemoteExtensionHostStartParams = {
 				language: platform.language,
 				debugId: this._environmentService.debugExtensionHost.debugId,
 				break: this._environmentService.debugExtensionHost.break,
@@ -158,10 +159,11 @@ export class RemoteExtensionHostClient extends Disposable implements IExtensionH
 
 				});
 			});
+		*/
 		});
 	}
 
-	private _onExtHostConnectionLost(): void {
+	/*private _onExtHostConnectionLost(): void {
 
 		if (this._isExtensionDevHost && this._environmentService.debugExtensionHost.debugId) {
 			this._extensionHostDebugService.close(this._environmentService.debugExtensionHost.debugId);
@@ -173,9 +175,9 @@ export class RemoteExtensionHostClient extends Disposable implements IExtensionH
 		}
 
 		this._onExit.fire([0, null]);
-	}
+	}*/
 
-	private _createExtHostInitData(isExtensionDevelopmentDebug: boolean): Promise<IInitData> {
+	/*private _createExtHostInitData(isExtensionDevelopmentDebug: boolean): Promise<IInitData> {
 		return Promise.all([this._allExtensions, this._telemetryService.getTelemetryInfo(), this._initDataProvider.getInitData()]).then(([allExtensions, telemetryInfo, remoteExtensionHostData]) => {
 			// Collect all identifiers for extension ids which can be considered "resolved"
 			const resolvedExtensions = allExtensions.filter(extension => !extension.main).map(extension => extension.identifier);
@@ -211,7 +213,7 @@ export class RemoteExtensionHostClient extends Disposable implements IExtensionH
 				resolvedExtensions: resolvedExtensions,
 				hostExtensions: hostExtensions,
 				extensions: remoteExtensionHostData.extensions,
-				telemetryInfo,
+				//telemetryInfo,
 				logLevel: this._logService.getLevel(),
 				logsLocation: remoteExtensionHostData.extensionHostLogsPath,
 				autoStart: true,
@@ -219,7 +221,7 @@ export class RemoteExtensionHostClient extends Disposable implements IExtensionH
 			};
 			return r;
 		});
-	}
+	}*/
 
 	getInspectPort(): number | undefined {
 		return undefined;
@@ -232,13 +234,13 @@ export class RemoteExtensionHostClient extends Disposable implements IExtensionH
 	dispose(): void {
 		super.dispose();
 
-		this._terminating = true;
+		// this._terminating = true;
 
 		if (this._protocol) {
 			// Send the extension host a request to terminate itself
 			// (graceful termination)
 			const socket = this._protocol.getSocket();
-			this._protocol.send(createMessageOfType(MessageType.Terminate));
+			//this._protocol.send(createMessageOfType(MessageType.Terminate));
 			this._protocol.sendDisconnect();
 			this._protocol.dispose();
 			socket.end();

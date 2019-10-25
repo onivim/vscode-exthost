@@ -3,20 +3,20 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { IMessagePassingProtocol } from 'vs/base/parts/ipc/common/ipc';
-import { VSBuffer } from 'vs/base/common/buffer';
-import { Emitter } from 'vs/base/common/event';
-import { isMessageOfType, MessageType, createMessageOfType } from 'vs/workbench/services/extensions/common/extensionHostProtocol';
-import { IInitData } from 'vs/workbench/api/common/extHost.protocol';
-import { ExtensionHostMain } from 'vs/workbench/services/extensions/common/extensionHostMain';
-import { IHostUtils } from 'vs/workbench/api/common/extHostExtensionService';
+//import { IMessagePassingProtocol } from 'vs/base/parts/ipc/common/ipc';
+//import { VSBuffer } from 'vs/base/common/buffer';
+//import { Emitter } from 'vs/base/common/event';
+//import { isMessageOfType, MessageType, createMessageOfType } from 'vs/workbench/services/extensions/common/extensionHostProtocol';
+//import { IInitData } from 'vs/workbench/api/common/extHost.protocol';
+//import { ExtensionHostMain } from 'vs/workbench/services/extensions/common/extensionHostMain';
+//import { IHostUtils } from 'vs/workbench/api/common/extHostExtensionService';
 import 'vs/workbench/services/extensions/worker/extHost.services';
 
 //#region --- Define, capture, and override some globals
 //todo@joh do not allow extensions to call postMessage and other globals...
 
 // declare WorkerSelf#postMessage
-declare function postMessage(data: any, transferables?: Transferable[]): void;
+//declare function postMessage(data: any, transferables?: Transferable[]): void;
 
 declare namespace self {
 	let close: any;
@@ -26,18 +26,18 @@ declare namespace self {
 	let caches: { open: any, [k: string]: any };
 }
 
-const nativeClose = self.close.bind(self);
+//const nativeClose = self.close.bind(self);
 self.close = () => console.trace(`'close' has been blocked`);
 
-const nativePostMessage = postMessage.bind(self);
+//const nativePostMessage = postMessage.bind(self);
 self.postMessage = () => console.trace(`'postMessage' has been blocked`);
 
-const nativeAddEventLister = addEventListener.bind(self);
+//const nativeAddEventLister = addEventListener.bind(self);
 self.addEventLister = () => console.trace(`'addEventListener' has been blocked`);
 
 //#endregion ---
 
-const hostUtil = new class implements IHostUtils {
+/*const hostUtil = new class implements IHostUtils {
 	_serviceBrand: undefined;
 	exit(_code?: number | undefined): void {
 		nativeClose();
@@ -48,10 +48,10 @@ const hostUtil = new class implements IHostUtils {
 	async realpath(path: string): Promise<string> {
 		return path;
 	}
-};
+};*/
 
 
-class ExtensionWorker {
+/*class ExtensionWorker {
 
 	// protocol
 	readonly protocol: IMessagePassingProtocol;
@@ -70,15 +70,15 @@ class ExtensionWorker {
 			}
 
 			const msg = VSBuffer.wrap(new Uint8Array(data, 0, data.byteLength));
-			if (isMessageOfType(msg, MessageType.Terminate)) {
+/*			if (isMessageOfType(msg, MessageType.Terminate)) {
 				// handle terminate-message right here
 				terminating = true;
 				onTerminate();
 				return;
-			}
+			}*/
 
 			// emit non-terminate messages to the outside
-			emitter.fire(msg);
+			/*emitter.fire(msg);
 		});
 
 		this.protocol = {
@@ -91,30 +91,30 @@ class ExtensionWorker {
 			}
 		};
 	}
-}
+}*/
 
-interface IRendererConnection {
+/*interface IRendererConnection {
 	protocol: IMessagePassingProtocol;
 	initData: IInitData;
-}
-function connectToRenderer(protocol: IMessagePassingProtocol): Promise<IRendererConnection> {
+}*/
+/*function connectToRenderer(protocol: IMessagePassingProtocol): Promise<IRendererConnection> {
 	return new Promise<IRendererConnection>(resolve => {
 		const once = protocol.onMessage(raw => {
 			once.dispose();
 			const initData = <IInitData>JSON.parse(raw.toString());
-			protocol.send(createMessageOfType(MessageType.Initialized));
+			//protocol.send(createMessageOfType(MessageType.Initialized));
 			resolve({ protocol, initData });
 		});
-		protocol.send(createMessageOfType(MessageType.Ready));
+		//protocol.send(createMessageOfType(MessageType.Ready));
 	});
-}
+}*/
 
-let onTerminate = nativeClose;
+//let onTerminate = nativeClose;
 
 (function create(): void {
-	const res = new ExtensionWorker();
+	//const res = new ExtensionWorker();
 
-	connectToRenderer(res.protocol).then(data => {
+	/*connectToRenderer(res.protocol).then(data => {
 
 		const extHostMain = new ExtensionHostMain(
 			data.protocol,
@@ -124,5 +124,5 @@ let onTerminate = nativeClose;
 		);
 
 		onTerminate = () => extHostMain.terminate();
-	});
+	});*/
 })();

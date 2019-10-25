@@ -64,6 +64,7 @@ export class ExtHostConfiguration implements ExtHostConfigurationShape {
 	}
 
 	$initializeConfiguration(data: IConfigurationInitData): void {
+		console.error("[exthost] initializeConfiguration called");
 		this._actual = new ExtHostConfigProvider(this._proxy, this._extHostWorkspace, data);
 		this._barrier.open();
 	}

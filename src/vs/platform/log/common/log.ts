@@ -169,37 +169,37 @@ export class ConsoleLogService extends AbstractLogService implements ILogService
 
 	trace(message: string, ...args: any[]): void {
 		if (this.getLevel() <= LogLevel.Trace) {
-			console.log('%cTRACE', 'color: #888', message, ...args);
+			console.error('%cTRACE', 'color: #888', message, ...args);
 		}
 	}
 
 	debug(message: string, ...args: any[]): void {
 		if (this.getLevel() <= LogLevel.Debug) {
-			console.log('%cDEBUG', 'background: #eee; color: #888', message, ...args);
+			console.error('%cDEBUG', 'background: #eee; color: #888', message, ...args);
 		}
 	}
 
 	info(message: string, ...args: any[]): void {
 		if (this.getLevel() <= LogLevel.Info) {
-			console.log('%c INFO', 'color: #33f', message, ...args);
+			console.error('%c INFO', 'color: #33f', message, ...args);
 		}
 	}
 
 	warn(message: string | Error, ...args: any[]): void {
 		if (this.getLevel() <= LogLevel.Warning) {
-			console.log('%c WARN', 'color: #993', message, ...args);
+			console.error('%c WARN', 'color: #993', message, ...args);
 		}
 	}
 
 	error(message: string, ...args: any[]): void {
 		if (this.getLevel() <= LogLevel.Error) {
-			console.log('%c  ERR', 'color: #f33', message, ...args);
+			console.error('%c  ERR', 'color: #f33', message, ...args);
 		}
 	}
 
 	critical(message: string, ...args: any[]): void {
 		if (this.getLevel() <= LogLevel.Critical) {
-			console.log('%cCRITI', 'background: #f33; color: white', message, ...args);
+			console.error('%cCRITI', 'background: #f33; color: white', message, ...args);
 		}
 	}
 
