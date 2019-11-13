@@ -3,9 +3,6 @@ steps:
   inputs:
     versionSpec: "10.15.1"
 - powershell: |
-    npm install -g yarn@1.13.0
-  displayName: Install yarn
-- powershell: |
     npm install -g jest@24.5.0
   displayName: Install jest
 - task: UsePythonVersion@0
