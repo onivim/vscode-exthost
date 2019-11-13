@@ -154,7 +154,6 @@ export class ExtensionHostMain {
 		}, 1000);
 	}
 
-<<<<<<< HEAD
 	private transform(rawInitData: IRawInitData): IInitData {
 		let uriOrNull = (v: string | null) => {
 			if (v) {

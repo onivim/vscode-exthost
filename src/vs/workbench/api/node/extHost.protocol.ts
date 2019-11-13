@@ -75,6 +75,7 @@ export interface IRawEnvironment {
 	extensionDevelopmentLocationPath: string;
 	extensionTestsLocationPath: string;
 	globalStorageHomePath: string;
+	userHome: string;
 }
 
 export interface IRawExtensionDescription extends IExtensionManifest {
