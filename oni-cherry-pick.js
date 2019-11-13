@@ -13,17 +13,17 @@ const shell = (sz) => {
 
 const currentBranch = shell("git rev-parse --abbrev-ref HEAD");
 
-/*if (currentBranch !== "master") {
+if (currentBranch !== "master") {
 	console.error("Script must be run on MASTER");
 	process.exit(0);
-}*/
+}
 
 const log = (msg) => console.log("** INFO: " + msg);
 
 let lastCommit = fs.readFileSync("oni-last-cherry-pick").toString("utf8").trim();
 log("Last commit that was cherry-picked: " + lastCommit);
 
-//shell("git checkout -b cherry-pick-" + lastCommit);
+shell("git checkout -b merge-pick-" + lastCommit);
 
 const BATCH_SIZE = 10;
 
@@ -51,6 +51,4 @@ try {
 	// We finally failed....
 	console.log("Ended on commit: " + lastCommit);
 }
-
-
 
