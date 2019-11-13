@@ -1,6 +1,6 @@
 /*
  * ExtensionHost.ts
- * 
+ *
  * Helper API for testing / exercising an extension host
  */
 
@@ -87,6 +87,7 @@ export interface IExtensionHost {
     createDocument: (uri: any, lines: string[], modeId: string) => void;
     updateDocument: (uri: any, range: ChangedEventRange, text: string, version: number) => void;
 
+    provideCompletionItems: (handle: number, resource: any, position: any, context: any) => Promise<any>;
 
     onMessage: IEvent<any>;
 }
@@ -98,6 +99,7 @@ export let withExtensionHost = async (extensions: string[], f: apiFunction) => {
     let incomingNotification = new rpc.NotificationType<any, any>('host/msg');
     let outgoingNotification = new rpc.NotificationType<any, any>('ext/msg');
 
+    let pendingCallbacks: { [key: number]: any} = {};
     let requestId = 0;
 
     let onMessageEvent = new Event<any>();
@@ -120,8 +122,15 @@ export let withExtensionHost = async (extensions: string[], f: apiFunction) => {
 
             if(msg.type === MessageType.Ready) {
                 c();
+            } else if(msg.type === MessageType.ReplyOKJSON) {
+                const reqId = msg.reqId;
+                const callback = pendingCallbacks[reqId];
+                if(callback) {
+                    callback.resolve(msg.payload);
+                }
             } else {
 
+                console.log("GOT MESSAGE: " + JSON.stringify(msg))
                 /* TODO: Have a way for the user to specify a reply */
                 connection.sendNotification(outgoingNotification, {
                     type: MessageType.ReplyOKJSON,
@@ -201,7 +210,7 @@ export let withExtensionHost = async (extensions: string[], f: apiFunction) => {
 
                 const { args, rpcName, methodName } = v.payload;
 
-                console.log(`waitForMessageOnce: [${rpcName} | ${methodName}]: ${args}`);
+                //console.log(`waitForMessageOnce: [${rpcName} | ${methodName}]: ${args}`);
 
                 if (rpcName === expectedRpc && expectedMethod == methodName && filter(args)) {
                     c();
@@ -209,7 +218,7 @@ export let withExtensionHost = async (extensions: string[], f: apiFunction) => {
                 }
             })
         });
-        
+
     };
 
 
@@ -218,6 +227,20 @@ export let withExtensionHost = async (extensions: string[], f: apiFunction) => {
         reqId: requestId++,
         payload,
     });
+
+    let sendRequest = (payload) => {
+
+        let newRequestId = requestId++;
+        connection.sendNotification(outgoingNotification, {
+        type: MessageType.RequestJSONArgs,
+        reqId: requestId,
+        payload,
+    });
+
+    return new Promise((resolve, reject) => {
+        pendingCallbacks[requestId] = { resolve, reject };
+    });
+    };
 
     let createDocument = (uri: any, lines: string[], modeId: string) => {
             let testModelAdded = {
@@ -252,6 +275,10 @@ export let withExtensionHost = async (extensions: string[], f: apiFunction) => {
          sendNotification(["ExtHostDocuments", "$acceptModelChanged", [uri, changedEvent, true]]);
     };
 
+    let provideCompletionItems = (handle: number, resource: any, position: any, context: any) => {
+        return sendRequest(["ExtHostLanguageFeatures", "$provideCompletionItems", [handle, resource, position, context, null]]);
+    };
+
     let extHost = {
         start,
         sendNotification,
@@ -259,6 +286,7 @@ export let withExtensionHost = async (extensions: string[], f: apiFunction) => {
         waitForMessageOnce,
         createDocument,
         updateDocument,
+        provideCompletionItems,
     };
 
     await f(extHost);
