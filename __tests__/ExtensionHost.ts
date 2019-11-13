@@ -12,21 +12,21 @@ import * as rpc from "vscode-jsonrpc";
 let bootstrapForkPath = path.join(__dirname, "..", "out", "bootstrap-fork.js");
 
 export const enum MessageType {
-	Initialized = 0,
-	Ready = 1,
-	InitData = 2,
-	Terminate = 3,
-	RequestJSONArgs = 4,
-	RequestJSONArgsWithCancellation = 5,
-	RequestMixedArgs = 6,
-	RequestMixedArgsWithCancellation = 7,
-	Acknowledged = 8,
-	Cancel = 9,
-	ReplyOKEmpty = 10,
-	ReplyOKBuffer = 11,
-	ReplyOKJSON = 12,
-	ReplyErrError = 13,
-	ReplyErrEmpty = 14,
+    Initialized = 0,
+    Ready = 1,
+    InitData = 2,
+    Terminate = 3,
+    RequestJSONArgs = 4,
+    RequestJSONArgsWithCancellation = 5,
+    RequestMixedArgs = 6,
+    RequestMixedArgsWithCancellation = 7,
+    Acknowledged = 8,
+    Cancel = 9,
+    ReplyOKEmpty = 10,
+    ReplyOKBuffer = 11,
+    ReplyOKJSON = 12,
+    ReplyErrError = 13,
+    ReplyErrEmpty = 14,
 };
 
 import { EventEmitter } from "events"
@@ -99,7 +99,7 @@ export let withExtensionHost = async (extensions: string[], f: apiFunction) => {
     let incomingNotification = new rpc.NotificationType<any, any>('host/msg');
     let outgoingNotification = new rpc.NotificationType<any, any>('ext/msg');
 
-    let pendingCallbacks: { [key: number]: any} = {};
+    let pendingCallbacks: { [key: number]: any } = {};
     let requestId = 0;
 
     let onMessageEvent = new Event<any>();
@@ -120,17 +120,16 @@ export let withExtensionHost = async (extensions: string[], f: apiFunction) => {
     let promise = new Promise((c) => {
         connection.onNotification(incomingNotification, (msg) => {
 
-            if(msg.type === MessageType.Ready) {
+            if (msg.type === MessageType.Ready) {
                 c();
-            } else if(msg.type === MessageType.ReplyOKJSON) {
+            } else if (msg.type === MessageType.ReplyOKJSON) {
                 const reqId = msg.reqId;
                 const callback = pendingCallbacks[reqId];
-                if(callback) {
+                if (callback) {
                     callback.resolve(msg.payload);
                 }
             } else {
-
-                console.log("GOT MESSAGE: " + JSON.stringify(msg))
+                //console.log("GOT MESSAGE: " + JSON.stringify(msg))
                 /* TODO: Have a way for the user to specify a reply */
                 connection.sendNotification(outgoingNotification, {
                     type: MessageType.ReplyOKJSON,
@@ -200,7 +199,7 @@ export let withExtensionHost = async (extensions: string[], f: apiFunction) => {
 
     let defaultFilter = (payload: any) => true;
 
-    let waitForMessageOnce = (expectedRpc: string, expectedMethod: string, filter:filterFunc = defaultFilter): Promise<void> => {
+    let waitForMessageOnce = (expectedRpc: string, expectedMethod: string, filter: filterFunc = defaultFilter): Promise<void> => {
         return new Promise<void>((c) => {
             let subscription = onMessageEvent.subscribe((v) => {
 
@@ -232,47 +231,47 @@ export let withExtensionHost = async (extensions: string[], f: apiFunction) => {
 
         let newRequestId = requestId++;
         connection.sendNotification(outgoingNotification, {
-        type: MessageType.RequestJSONArgs,
-        reqId: requestId,
-        payload,
-    });
+            type: MessageType.RequestJSONArgs,
+            reqId: requestId,
+            payload,
+        });
 
-    return new Promise((resolve, reject) => {
-        pendingCallbacks[requestId] = { resolve, reject };
-    });
+        return new Promise((resolve, reject) => {
+            pendingCallbacks[requestId] = { resolve, reject };
+        });
     };
 
     let createDocument = (uri: any, lines: string[], modeId: string) => {
-            let testModelAdded = {
-                uri: uri,
-                lines: lines,
-                EOL: "\n",
-                modeId: modeId,
-                isDirty: true,
-            };
+        let testModelAdded = {
+            uri: uri,
+            lines: lines,
+            EOL: "\n",
+            modeId: modeId,
+            isDirty: true,
+        };
 
-            let update = {
-                removedDocuments: [],
-                addedDocuments: [testModelAdded],
-                removedEditors: [],
-                addedEditors: [],
-                newActiveEditor: null,
-            };
+        let update = {
+            removedDocuments: [],
+            addedDocuments: [testModelAdded],
+            removedEditors: [],
+            addedEditors: [],
+            newActiveEditor: null,
+        };
 
-            sendNotification(["ExtHostDocumentsAndEditors", "$acceptDocumentsAndEditorsDelta", [update]]);
+        sendNotification(["ExtHostDocumentsAndEditors", "$acceptDocumentsAndEditorsDelta", [update]]);
     };
 
     let updateDocument = (uri: any, range: ChangedEventRange, text: string, versionId: number) => {
-         let changedEvent = {
-             changes: [{
-                 range: range,
-                 text: text,
-             }],
-             eol: "\n",
-             versionId: versionId,
-         };
+        let changedEvent = {
+            changes: [{
+                range: range,
+                text: text,
+            }],
+            eol: "\n",
+            versionId: versionId,
+        };
 
-         sendNotification(["ExtHostDocuments", "$acceptModelChanged", [uri, changedEvent, true]]);
+        sendNotification(["ExtHostDocuments", "$acceptModelChanged", [uri, changedEvent, true]]);
     };
 
     let provideCompletionItems = (handle: number, resource: any, position: any, context: any) => {
