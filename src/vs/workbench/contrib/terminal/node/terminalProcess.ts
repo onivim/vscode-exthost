@@ -3,26 +3,28 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import * as os from 'os';
-import * as path from 'vs/base/common/path';
+//import * as os from 'os';
+//import * as path from 'vs/base/common/path';
 import * as platform from 'vs/base/common/platform';
-import * as pty from 'node-pty';
-import * as fs from 'fs';
+//import * as pty from 'node-pty';
+//import * as fs from 'fs';
 import { Event, Emitter } from 'vs/base/common/event';
-import { getWindowsBuildNumber } from 'vs/workbench/contrib/terminal/node/terminal';
+//import { getWindowsBuildNumber } from 'vs/workbench/contrib/terminal/node/terminal';
 import { Disposable } from 'vs/base/common/lifecycle';
-import { IShellLaunchConfig, ITerminalChildProcess, SHELL_PATH_INVALID_EXIT_CODE, SHELL_PATH_DIRECTORY_EXIT_CODE, SHELL_CWD_INVALID_EXIT_CODE } from 'vs/workbench/contrib/terminal/common/terminal';
-import { exec } from 'child_process';
+import { IShellLaunchConfig, ITerminalChildProcess, /*SHELL_PATH_INVALID_EXIT_CODE, SHELL_PATH_DIRECTORY_EXIT_CODE, SHELL_CWD_INVALID_EXIT_CODE*/ } from 'vs/workbench/contrib/terminal/common/terminal';
+//import { exec } from 'child_process';
 import { ILogService } from 'vs/platform/log/common/log';
-import { stat } from 'vs/base/node/pfs';
-import { findExecutable } from 'vs/workbench/contrib/terminal/node/terminalEnvironment';
-import { URI } from 'vs/base/common/uri';
+//import { stat } from 'vs/base/node/pfs';
+//import { findExecutable } from 'vs/workbench/contrib/terminal/node/terminalEnvironment';
+// import { URI } from 'vs/base/common/uri';
+
+const noop = () => { };
 
 export class TerminalProcess extends Disposable implements ITerminalChildProcess {
 	private _exitCode: number | undefined;
 	private _closeTimeout: any;
-	private _ptyProcess: pty.IPty | undefined;
-	private _currentTitle: string = '';
+	//private _ptyProcess: pty.IPty | undefined;
+	//private _currentTitle: string = '';
 	private _processStartupComplete: Promise<void> | undefined;
 	private _isDisposed: boolean = false;
 	private _titleInterval: NodeJS.Timer | null = null;
@@ -47,18 +49,21 @@ export class TerminalProcess extends Disposable implements ITerminalChildProcess
 		@ILogService private readonly _logService: ILogService
 	) {
 		super();
-		let shellName: string;
+		if (this._logService) {
+			noop();
+		};
+		/*let shellName: string;
 		if (os.platform() === 'win32') {
 			shellName = path.basename(shellLaunchConfig.executable || '');
 		} else {
 			// Using 'xterm-256color' here helps ensure that the majority of Linux distributions will use a
 			// color prompt as defined in the default ~/.bashrc file.
 			shellName = 'xterm-256color';
-		}
+		}*/
 
 		this._initialCwd = cwd;
 
-		const useConpty = windowsEnableConpty && process.platform === 'win32' && getWindowsBuildNumber() >= 18309;
+		/*const useConpty = windowsEnableConpty && process.platform === 'win32' && getWindowsBuildNumber() >= 18309;
 		const options: pty.IPtyForkOptions | pty.IWindowsPtyForkOptions = {
 			name: shellName,
 			cwd,
@@ -102,16 +107,16 @@ export class TerminalProcess extends Disposable implements ITerminalChildProcess
 			this.setupPtyProcess(shellLaunchConfig, options);
 		}).catch((exitCode: number) => {
 			return this._launchFailed(exitCode);
-		});
+		});*/
 	}
 
-	private _launchFailed(exitCode: number): void {
+	/*private _launchFailed(exitCode: number): void {
 		this._exitCode = exitCode;
 		this._queueProcessExit();
 		this._processStartupComplete = Promise.resolve(undefined);
-	}
+	}*/
 
-	private setupPtyProcess(shellLaunchConfig: IShellLaunchConfig, options: pty.IPtyForkOptions): void {
+	/*private setupPtyProcess(shellLaunchConfig: IShellLaunchConfig, options: pty.IPtyForkOptions): void {
 		const args = shellLaunchConfig.args || [];
 		this._logService.trace('IPty#spawn', shellLaunchConfig.executable, args, options);
 		const ptyProcess = pty.spawn(shellLaunchConfig.executable!, args, options);
@@ -135,7 +140,7 @@ export class TerminalProcess extends Disposable implements ITerminalChildProcess
 		setTimeout(() => {
 			this._sendProcessId(ptyProcess);
 		}, 500);
-	}
+	}*/
 
 	public dispose(): void {
 		this._isDisposed = true;
@@ -150,7 +155,7 @@ export class TerminalProcess extends Disposable implements ITerminalChildProcess
 		super.dispose();
 	}
 
-	private _setupTitlePolling(ptyProcess: pty.IPty) {
+	/*private _setupTitlePolling(ptyProcess: pty.IPty) {
 		// Send initial timeout async to give event listeners a chance to init
 		setTimeout(() => {
 			this._sendProcessTitle(ptyProcess);
@@ -163,7 +168,7 @@ export class TerminalProcess extends Disposable implements ITerminalChildProcess
 				}
 			}, 200);
 		}
-	}
+	}*/
 
 	// Allow any trailing data events to be sent before the exit event is sent.
 	// See https://github.com/Tyriar/node-pty/issues/72
@@ -183,30 +188,30 @@ export class TerminalProcess extends Disposable implements ITerminalChildProcess
 			}
 			// Attempt to kill the pty, it may have already been killed at this
 			// point but we want to make sure
-			try {
+			/*try {
 				if (this._ptyProcess) {
 					this._logService.trace('IPty#kill');
 					this._ptyProcess.kill();
 				}
 			} catch (ex) {
 				// Swallow, the pty has already been killed
-			}
+			}*/
 			this._onProcessExit.fire(this._exitCode || 0);
 			this.dispose();
 		});
 	}
 
-	private _sendProcessId(ptyProcess: pty.IPty) {
+	/*private _sendProcessId(ptyProcess: pty.IPty) {
 		this._onProcessReady.fire({ pid: ptyProcess.pid, cwd: this._initialCwd });
-	}
+	}*/
 
-	private _sendProcessTitle(ptyProcess: pty.IPty): void {
+	/*private _sendProcessTitle(ptyProcess: pty.IPty): void {
 		if (this._isDisposed) {
 			return;
 		}
 		this._currentTitle = ptyProcess.process;
 		this._onProcessTitleChanged.fire(this._currentTitle);
-	}
+	}*/
 
 	public shutdown(immediate: boolean): void {
 		if (immediate) {
@@ -217,11 +222,11 @@ export class TerminalProcess extends Disposable implements ITerminalChildProcess
 	}
 
 	public input(data: string): void {
-		if (this._isDisposed || !this._ptyProcess) {
+		/*if (this._isDisposed || !this._ptyProcess) {
 			return;
 		}
 		this._logService.trace('IPty#write', `${data.length} characters`);
-		this._ptyProcess.write(data);
+		this._ptyProcess.write(data);*/
 	}
 
 	public resize(cols: number, rows: number): void {
@@ -231,9 +236,10 @@ export class TerminalProcess extends Disposable implements ITerminalChildProcess
 		if (typeof cols !== 'number' || typeof rows !== 'number' || isNaN(cols) || isNaN(rows)) {
 			return;
 		}
+
 		// Ensure that cols and rows are always >= 1, this prevents a native
 		// exception in winpty.
-		if (this._ptyProcess) {
+		/*if (this._ptyProcess) {
 			cols = Math.max(cols, 1);
 			rows = Math.max(rows, 1);
 			this._logService.trace('IPty#resize', cols, rows);
@@ -245,7 +251,7 @@ export class TerminalProcess extends Disposable implements ITerminalChildProcess
 					throw e;
 				}
 			}
-		}
+		}*/
 	}
 
 	public getInitialCwd(): Promise<string> {
@@ -253,7 +259,7 @@ export class TerminalProcess extends Disposable implements ITerminalChildProcess
 	}
 
 	public getCwd(): Promise<string> {
-		if (platform.isMacintosh) {
+		/*if (platform.isMacintosh) {
 			return new Promise<string>(resolve => {
 				if (!this._ptyProcess) {
 					resolve(this._initialCwd);
@@ -287,6 +293,8 @@ export class TerminalProcess extends Disposable implements ITerminalChildProcess
 		return new Promise<string>(resolve => {
 			resolve(this._initialCwd);
 		});
+		*/
+		return new Promise<string>(resolve => resolve(""));
 	}
 
 	public getLatency(): Promise<number> {
