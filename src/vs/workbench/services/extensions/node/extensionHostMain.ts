@@ -154,6 +154,7 @@ export class ExtensionHostMain {
 		}, 1000);
 	}
 
+<<<<<<< HEAD
 	private transform(rawInitData: IRawInitData): IInitData {
 		let uriOrNull = (v: string | null) => {
 			if (v) {
@@ -179,6 +180,7 @@ export class ExtensionHostMain {
 				extensionDevelopmentLocationURI: uriOrNull(rawEnvironment.extensionDevelopmentLocationPath),
 				extensionTestsLocationURI: uriOrNull(rawEnvironment.extensionTestsLocationPath),
 				globalStorageHome: uriOrNull(rawEnvironment.globalStorageHomePath),
+				userHome: uriOrNull(rawEnvironment.userHome),
 			}
 		}
 
@@ -191,6 +193,7 @@ export class ExtensionHostMain {
 			hostExtensions: [],
 			// workspace: uriOrNull(rawInitData.workspacePath),
 		}
+
 		return initData;
 	}
 }

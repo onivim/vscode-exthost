@@ -419,37 +419,38 @@ export class ExtensionHostProcessWorker implements IExtensionHostStarter {
 		});
 	}
 
-	// private _createExtHostInitData(): Promise<IInitData> {
-	// 	return Promise.all([this._telemetryService.getTelemetryInfo(), this._extensions])
-	// 		.then(([telemetryInfo, extensionDescriptions]) => {
-	// 			const workspace = this._contextService.getWorkspace();
-	// 			const r: IInitData = {
-	// 				commit: product.commit,
-	// 				parentPid: process.pid,
-	// 				environment: {
-	// 					isExtensionDevelopmentDebug: this._isExtensionDevDebug,
-	// 					appRoot: this._environmentService.appRoot ? URI.file(this._environmentService.appRoot) : undefined,
-	// 					appSettingsHome: this._environmentService.appSettingsHome ? URI.file(this._environmentService.appSettingsHome) : undefined,
-	// 					extensionDevelopmentLocationURI: this._environmentService.extensionDevelopmentLocationURI,
-	// 					extensionTestsLocationURI: this._environmentService.extensionTestsLocationURI,
-	// 					globalStorageHome: URI.file(this._environmentService.globalStorageHome)
-	// 				},
-	// 				workspace: this._contextService.getWorkbenchState() === WorkbenchState.EMPTY ? undefined : {
-	// 					configuration: withNullAsUndefined(workspace.configuration),
-	// 					id: workspace.id,
-	// 					name: this._labelService.getWorkspaceLabel(workspace)
-	// 				},
-	// 				resolvedExtensions: [],
-	// 				hostExtensions: [],
-	// 				extensions: extensionDescriptions,
-	// 				telemetryInfo,
-	// 				logLevel: this._logService.getLevel(),
-	// 				logsLocation: this._extensionHostLogsLocation,
-	// 				autoStart: this._autoStart
-	// 			};
-	// 			return r;
-	// 		});
-	// }
+	/*private _createExtHostInitData(): Promise<IInitData> {
+		return Promise.all([this._telemetryService.getTelemetryInfo(), this._extensions])
+			.then(([telemetryInfo, extensionDescriptions]) => {
+				const workspace = this._contextService.getWorkspace();
+				const r: IInitData = {
+					commit: product.commit,
+					parentPid: process.pid,
+					environment: {
+						isExtensionDevelopmentDebug: this._isExtensionDevDebug,
+						appRoot: this._environmentService.appRoot ? URI.file(this._environmentService.appRoot) : undefined,
+						appSettingsHome: this._environmentService.appSettingsHome ? URI.file(this._environmentService.appSettingsHome) : undefined,
+						extensionDevelopmentLocationURI: this._environmentService.extensionDevelopmentLocationURI,
+						extensionTestsLocationURI: this._environmentService.extensionTestsLocationURI,
+						globalStorageHome: URI.file(this._environmentService.globalStorageHome),
+						userHome: URI.file(this._environmentService.userHome)
+					},
+					workspace: this._contextService.getWorkbenchState() === WorkbenchState.EMPTY ? undefined : {
+						configuration: withNullAsUndefined(workspace.configuration),
+						id: workspace.id,
+						name: this._labelService.getWorkspaceLabel(workspace)
+					},
+					resolvedExtensions: [],
+					hostExtensions: [],
+					extensions: extensionDescriptions,
+					telemetryInfo,
+					logLevel: this._logService.getLevel(),
+					logsLocation: this._extensionHostLogsLocation,
+					autoStart: this._autoStart
+				};
+				return r;
+			});
+	}*/
 
 	private _logExtensionHostMessage(entry: IRemoteConsoleLog) {
 
