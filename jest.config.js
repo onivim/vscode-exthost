@@ -12,5 +12,5 @@ module.exports = {
     "json",
     "node"
   ],
-  "bail": 1,
+  "bail": true,
 }
