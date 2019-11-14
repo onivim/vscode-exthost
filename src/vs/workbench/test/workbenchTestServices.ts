@@ -26,7 +26,7 @@ import { IWorkspaceContextService, IWorkspace as IWorkbenchWorkspace, WorkbenchS
 import { ILifecycleService, BeforeShutdownEvent, ShutdownReason, StartupKind, LifecyclePhase, WillShutdownEvent } from 'vs/platform/lifecycle/common/lifecycle';
 import { ServiceCollection } from 'vs/platform/instantiation/common/serviceCollection';
 import { TextFileService } from 'vs/workbench/services/textfile/common/textFileService';
-import { FileOperationEvent, IFileService, IResolveContentOptions, FileOperationError, IFileStat, IResolveFileResult, FileChangesEvent, IResolveFileOptions, IContent, IUpdateContentOptions, IStreamContent, ICreateFileOptions, ITextSnapshot, IResourceEncodings } from 'vs/platform/files/common/files';
+import { FileOperationEvent, IFileService, IResolveContentOptions, FileOperationError, IFileStat, IResolveFileResult, FileChangesEvent, IResolveFileOptions, IContent, IUpdateContentOptions, IStreamContent, ICreateFileOptions, ITextSnapshot, IResourceEncodings, IResourceEncoding } from 'vs/platform/files/common/files';
 import { IModelService } from 'vs/editor/common/services/modelService';
 import { ModeServiceImpl } from 'vs/editor/common/services/modeServiceImpl';
 import { ModelServiceImpl } from 'vs/editor/common/services/modelServiceImpl';
@@ -503,6 +503,10 @@ export class TestLayoutService implements IWorkbenchLayoutService {
 
 	public isSideBarHidden(): boolean {
 		return false;
+	}
+
+	public get hasWorkbench(): boolean {
+		return true;
 	}
 
 	public setEditorHidden(_hidden: boolean): Promise<void> { return Promise.resolve(); }
@@ -1029,8 +1033,8 @@ export class TestFileService implements IFileService {
 	unwatchFileChanges(_resource: URI): void {
 	}
 
-	getWriteEncoding(_resource: URI): string {
-		return 'utf8';
+	getWriteEncoding(_resource: URI): IResourceEncoding {
+		return { encoding: 'utf8', hasBOM: false };
 	}
 
 	dispose(): void {
@@ -1558,8 +1562,8 @@ export class TestTextResourcePropertiesService implements ITextResourcePropertie
 export class TestHashService implements IHashService {
 	_serviceBrand: any;
 
-	createSHA1(content: string): string {
-		return content;
+	createSHA1(content: string): Thenable<string> {
+		return Promise.resolve(content);
 	}
 }
 
