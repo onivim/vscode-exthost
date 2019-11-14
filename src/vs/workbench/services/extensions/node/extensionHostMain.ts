@@ -179,6 +179,7 @@ export class ExtensionHostMain {
 				extensionDevelopmentLocationURI: uriOrNull(rawEnvironment.extensionDevelopmentLocationPath),
 				extensionTestsLocationURI: uriOrNull(rawEnvironment.extensionTestsLocationPath),
 				globalStorageHome: uriOrNull(rawEnvironment.globalStorageHomePath),
+				userHome: uriOrNull(rawEnvironment.userHome),
 			}
 		}
 
@@ -191,6 +192,7 @@ export class ExtensionHostMain {
 			hostExtensions: [],
 			// workspace: uriOrNull(rawInitData.workspacePath),
 		}
+
 		return initData;
 	}
 }

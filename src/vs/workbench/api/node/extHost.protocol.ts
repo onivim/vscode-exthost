@@ -55,6 +55,7 @@ export interface IEnvironment {
 	extensionDevelopmentLocationURI?: URI;
 	extensionTestsLocationURI?: URI;
 	globalStorageHome: URI;
+	userHome: URI;
 }
 
 export interface IStaticWorkspaceData {
@@ -74,6 +75,7 @@ export interface IRawEnvironment {
 	extensionDevelopmentLocationPath: string;
 	extensionTestsLocationPath: string;
 	globalStorageHomePath: string;
+	userHome: string;
 }
 
 export interface IRawExtensionDescription extends IExtensionManifest {
@@ -148,7 +150,8 @@ export interface CommentProviderFeatures {
 
 export interface MainThreadCommentsShape extends IDisposable {
 	$registerCommentController(handle: number, id: string, label: string): void;
-	$createCommentThread(handle: number, commentThreadHandle: number, threadId: string, resource: UriComponents, range: IRange, comments: modes.Comment[], acceptInputCommand: modes.Command, additionalCommands: modes.Command[], collapseState: modes.CommentThreadCollapsibleState): modes.CommentThread2 | undefined;
+	$updateCommentControllerFeatures(handle: number, features: CommentProviderFeatures): void;
+	$createCommentThread(handle: number, commentThreadHandle: number, threadId: string, resource: UriComponents, range: IRange, comments: modes.Comment[], acceptInputCommand: modes.Command | undefined, additionalCommands: modes.Command[], collapseState: modes.CommentThreadCollapsibleState): modes.CommentThread2 | undefined;
 	$deleteCommentThread(handle: number, commentThreadHandle: number): void;
 	$updateComments(handle: number, commentThreadHandle: number, comments: modes.Comment[]): void;
 	$setInputValue(handle: number, input: string): void;
@@ -494,7 +497,7 @@ export interface MainThreadQuickOpenShape extends IDisposable {
 }
 
 export interface MainThreadStatusBarShape extends IDisposable {
-	$setEntry(id: number, extensionId: ExtensionIdentifier, text: string, tooltip: string, command: string, color: string | ThemeColor, alignment: MainThreadStatusBarAlignment, priority: number): void;
+	$setEntry(id: number, extensionId: ExtensionIdentifier | undefined, text: string, tooltip: string, command: string, color: string | ThemeColor, alignment: MainThreadStatusBarAlignment, priority: number | undefined): void;
 	$dispose(id: number): void;
 }
 
@@ -1132,10 +1135,12 @@ export interface ExtHostProgressShape {
 }
 
 export interface ExtHostCommentsShape {
-	$provideDocumentComments(handle: number, document: UriComponents): Promise<modes.CommentInfo>;
+	$provideDocumentComments(handle: number, document: UriComponents): Promise<modes.CommentInfo | null>;
 	$createNewCommentThread(handle: number, document: UriComponents, range: IRange, text: string): Promise<modes.CommentThread | null>;
-	$onCommentWidgetInputChange(commentControllerHandle: number, input: string): Promise<number | undefined>;
+	$onCommentWidgetInputChange(commentControllerHandle: number, input: string | undefined): Promise<number | undefined>;
 	$provideCommentingRanges(commentControllerHandle: number, uriComponents: UriComponents, token: CancellationToken): Promise<IRange[] | undefined>;
+	$provideReactionGroup(commentControllerHandle: number): Promise<modes.CommentReaction[] | undefined>;
+	$toggleReaction(commentControllerHandle: number, threadHandle: number, uri: UriComponents, comment: modes.Comment, reaction: modes.CommentReaction): Promise<void>;
 	$createNewCommentWidgetCallback(commentControllerHandle: number, uriComponents: UriComponents, range: IRange, token: CancellationToken): void;
 	$replyToCommentThread(handle: number, document: UriComponents, range: IRange, commentThread: modes.CommentThread, text: string): Promise<modes.CommentThread | null>;
 	$editComment(handle: number, document: UriComponents, comment: modes.Comment, text: string): Promise<void>;

@@ -334,8 +334,8 @@ export class Workbench extends Disposable implements IWorkbenchLayoutService {
 			{ id: Parts.TITLEBAR_PART, role: 'contentinfo', classes: ['titlebar'] },
 			{ id: Parts.ACTIVITYBAR_PART, role: 'navigation', classes: ['activitybar', this.state.sideBar.position === Position.LEFT ? 'left' : 'right'] },
 			{ id: Parts.SIDEBAR_PART, role: 'complementary', classes: ['sidebar', this.state.sideBar.position === Position.LEFT ? 'left' : 'right'] },
-			{ id: Parts.PANEL_PART, role: 'complementary', classes: ['panel', this.state.panel.position === Position.BOTTOM ? 'bottom' : 'right'] },
 			{ id: Parts.EDITOR_PART, role: 'main', classes: ['editor'], options: { restorePreviousState: this.state.editor.restoreEditors } },
+			{ id: Parts.PANEL_PART, role: 'complementary', classes: ['panel', this.state.panel.position === Position.BOTTOM ? 'bottom' : 'right'] },
 			{ id: Parts.STATUSBAR_PART, role: 'contentinfo', classes: ['statusbar'] }
 		].forEach(({ id, role, classes, options }) => {
 			const partContainer = this.createPart(id, role, classes);
@@ -482,6 +482,8 @@ export class Workbench extends Disposable implements IWorkbenchLayoutService {
 	get dimension(): IDimension { return this._dimension; }
 
 	get container(): HTMLElement { return this.workbench; }
+
+	get hasWorkbench(): boolean { return true; }
 
 	private parts: Map<string, Part> = new Map<string, Part>();
 
@@ -900,7 +902,7 @@ export class Workbench extends Disposable implements IWorkbenchLayoutService {
 		return isAncestor(activeElement, container);
 	}
 
-	getContainer(part: Parts): HTMLElement | null {
+	getContainer(part: Parts): HTMLElement {
 		switch (part) {
 			case Parts.TITLEBAR_PART:
 				return this.getPart(Parts.TITLEBAR_PART).getContainer();
@@ -915,8 +917,6 @@ export class Workbench extends Disposable implements IWorkbenchLayoutService {
 			case Parts.STATUSBAR_PART:
 				return this.getPart(Parts.STATUSBAR_PART).getContainer();
 		}
-
-		return null;
 	}
 
 	isVisible(part: Parts): boolean {

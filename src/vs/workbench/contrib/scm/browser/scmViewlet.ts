@@ -273,12 +273,12 @@ export class MainPanel extends ViewletPanel {
 	}
 
 	private updateBodySize(): void {
-		const visibleCount = this.configurationService.getValue<number>('scm.providers.visible');
+		const visibleCount = Math.max(this.configurationService.getValue<number>('scm.providers.visible'), 1);
 		const empty = this.list.length === 0;
 		const size = Math.min(this.viewModel.repositories.length, visibleCount) * 22;
 
-		this.minimumBodySize = visibleCount === 0 ? 22 : size;
-		this.maximumBodySize = visibleCount === 0 ? Number.POSITIVE_INFINITY : empty ? Number.POSITIVE_INFINITY : size;
+		this.minimumBodySize = size;
+		this.maximumBodySize = empty ? Number.POSITIVE_INFINITY : size;
 	}
 
 	private onListContextMenu(e: IListContextMenuEvent<ISCMRepository>): void {
@@ -749,25 +749,7 @@ export class RepositoryPanel extends ViewletPanel {
 		super.renderHeaderTitle(container, title);
 		addClass(container, 'scm-provider');
 		append(container, $('span.type', undefined, type));
-		// const onContextMenu = Event.map(stop(domEvent(container, 'contextmenu')), e => new StandardMouseEvent(e));
-		// onContextMenu(this.onContextMenu, this, this.disposables);
 	}
-
-	// private onContextMenu(event: StandardMouseEvent): void {
-	// 	if (this.viewModel.selectedRepositories.length <= 1) {
-	// 		return;
-	// 	}
-
-	// 	this.contextMenuService.showContextMenu({
-	// 		getAnchor: () => ({ x: event.posx, y: event.posy }),
-	// 		getActions: () => [<IAction>{
-	// 			id: `scm.hideRepository`,
-	// 			label: localize('hideRepository', "Hide"),
-	// 			enabled: true,
-	// 			run: () => this.viewModel.hide(this.repository)
-	// 		}],
-	// 	});
-	// }
 
 	protected renderBody(container: HTMLElement): void {
 		const focusTracker = trackFocus(container);
@@ -1009,6 +991,7 @@ class RepositoryViewDescriptor implements IViewDescriptor {
 	readonly ctorDescriptor: { ctor: any, arguments?: any[] };
 	readonly canToggleVisibility = true;
 	readonly order = -500;
+	readonly workspace = true;
 
 	constructor(readonly repository: ISCMRepository, viewModel: IViewModel, readonly hideByDefault: boolean) {
 		const repoId = repository.provider.rootUri ? repository.provider.rootUri.toString() : `#${RepositoryViewDescriptor.counter++}`;
@@ -1027,6 +1010,7 @@ class MainPanelDescriptor implements IViewDescriptor {
 	readonly canToggleVisibility = true;
 	readonly hideByDefault = true;
 	readonly order = -1000;
+	readonly workspace = true;
 
 	constructor(viewModel: IViewModel) {
 		this.ctorDescriptor = { ctor: MainPanel, arguments: [viewModel] };
@@ -1185,7 +1169,7 @@ export class SCMViewlet extends ViewContainerViewlet implements IViewModel {
 	}
 
 	focus(): void {
-		if (this.repositoryCount) {
+		if (this.repositoryCount === 0) {
 			this.message.focus();
 		} else {
 			const repository = this.visibleRepositories[0];
@@ -1226,6 +1210,22 @@ export class SCMViewlet extends ViewContainerViewlet implements IViewModel {
 		}
 
 		return new ContextAwareMenuItemActionItem(action, this.keybindingService, this.notificationService, this.contextMenuService);
+	}
+
+	getActions(): IAction[] {
+		if (this.repositories.length > 0) {
+			return super.getActions();
+		}
+
+		return this.menus.getTitleActions();
+	}
+
+	getSecondaryActions(): IAction[] {
+		if (this.repositories.length > 0) {
+			return super.getSecondaryActions();
+		}
+
+		return this.menus.getTitleSecondaryActions();
 	}
 
 	getActionsContext(): any {

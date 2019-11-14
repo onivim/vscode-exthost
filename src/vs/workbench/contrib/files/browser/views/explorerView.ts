@@ -175,7 +175,7 @@ export class ExplorerView extends ViewletPanel {
 			const isEditing = !!this.explorerService.getEditableData(e);
 
 			if (isEditing) {
-				await this.tree.expand(e.parent);
+				await this.tree.expand(e.parent!);
 			} else {
 				DOM.removeClass(treeContainer, 'highlight');
 			}
@@ -319,9 +319,8 @@ export class ExplorerView extends ViewletPanel {
 			// Check if the item was previously also selected, if yes the user is simply expanding / collapsing current selection #66589.
 			const shiftDown = e.browserEvent instanceof KeyboardEvent && e.browserEvent.shiftKey;
 			if (selection.length === 1 && !shiftDown) {
-				// Do not react if user is clicking on explorer items which are input placeholders
-				if (!selection[0].name || selection[0].isDirectory) {
-					// Do not react if user is clicking on explorer items which are input placeholders
+				if (selection[0].isDirectory || this.explorerService.isEditable(undefined)) {
+					// Do not react if user is clicking on explorer items while some are being edited #70276
 					// Do not react if clicking on directories
 					return;
 				}
@@ -400,7 +399,7 @@ export class ExplorerView extends ViewletPanel {
 					this.tree.domFocus();
 				}
 			},
-			getActionsContext: () => selection && selection.indexOf(stat) >= 0
+			getActionsContext: () => stat && selection && selection.indexOf(stat) >= 0
 				? selection.map((fs: ExplorerItem) => fs.resource)
 				: stat instanceof ExplorerItem ? [stat.resource] : []
 		});
@@ -508,7 +507,7 @@ export class ExplorerView extends ViewletPanel {
 		return withNullAsUndefined(toResource(input, { supportSideBySide: true }));
 	}
 
-	private onSelectItem(fileStat: ExplorerItem, reveal = this.autoReveal): Promise<void> {
+	private onSelectItem(fileStat: ExplorerItem | undefined, reveal = this.autoReveal): Promise<void> {
 		if (!fileStat || !this.isBodyVisible() || this.tree.getInput() === fileStat) {
 			return Promise.resolve(undefined);
 		}
@@ -531,7 +530,7 @@ export class ExplorerView extends ViewletPanel {
 		});
 	}
 
-	private onCopyItems(stats: ExplorerItem[], cut: boolean, previousCut: ExplorerItem[]): void {
+	private onCopyItems(stats: ExplorerItem[], cut: boolean, previousCut: ExplorerItem[] | undefined): void {
 		this.fileCopiedContextKey.set(stats.length > 0);
 		this.resourceCutContextKey.set(cut && stats.length > 0);
 		if (previousCut) {
