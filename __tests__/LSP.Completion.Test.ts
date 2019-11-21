@@ -51,7 +51,7 @@ describe("LSP", () => {
 
                 await onRegisterSuggest();
 
-                const { suggestions } = await api.provideCompletionItems(0, uri, { lineNumber: 1, column: 1 }, {});
+                const { suggestions } = await api.provideCompletionItems(0, uri, { lineNumber: 1, column: 1 }, { });
                 assert(suggestions.length == 2);
             });
         });
