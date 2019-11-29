@@ -241,6 +241,20 @@ export let withExtensionHost = async (extensions: string[], f: apiFunction) => {
         });
     };
 
+    let sendRequestWithCancellation = (payload) => {
+
+        let newRequestId = requestId++;
+        connection.sendNotification(outgoingNotification, {
+            type: MessageType.RequestJSONArgsWithCancellation,
+            reqId: requestId,
+            payload,
+        });
+
+        return new Promise((resolve, reject) => {
+            pendingCallbacks[requestId] = { resolve, reject };
+        });
+    };
+
     let createDocument = (uri: any, lines: string[], modeId: string) => {
         let testModelAdded = {
             uri: uri,
@@ -275,7 +289,7 @@ export let withExtensionHost = async (extensions: string[], f: apiFunction) => {
     };
 
     let provideCompletionItems = (handle: number, resource: any, position: any, context: any) => {
-        return sendRequest(["ExtHostLanguageFeatures", "$provideCompletionItems", [handle, resource, position, context, null]]);
+        return sendRequestWithCancellation(["ExtHostLanguageFeatures", "$provideCompletionItems", [handle, resource, position, context]]);
     };
 
     let extHost = {
