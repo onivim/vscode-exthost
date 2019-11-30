@@ -170,7 +170,7 @@ export let withExtensionHost = async (extensions: string[], f: apiFunction) => {
                 environment: {
                     globalStorageHomePath: require("os").tmpdir(),
                 },
-                workspace: {},
+                workspace: {name: "test", path: "/Users/bryphe/test", id: "testId"},
                 logsLocationPath: require("os").tmpdir(),
                 autoStart: true,
             }
@@ -189,7 +189,7 @@ export let withExtensionHost = async (extensions: string[], f: apiFunction) => {
                 id: "workspace-test",
                 name: "workspace-test",
                 configuration: null,
-                folders: [],
+                folders: [{ uri: {path: "/some/folder", scheme: "file"}, name: "workspace-test-1", id: "workspace-test-1"}],
             }]],
         });
 
