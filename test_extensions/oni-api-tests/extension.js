@@ -79,11 +79,8 @@ function activate(context) {
     context.subscriptions.push(disposable3);
     context.subscriptions.push(disposable4);
     context.subscriptions.push(disposable5);
-<<<<<<< HEAD
     context.subscriptions.push(disposable6);
     context.subscriptions.push(disposable7);
-=======
->>>>>>> master
 }
 
 // this method is called when your extension is deactivated
