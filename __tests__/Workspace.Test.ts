@@ -22,10 +22,7 @@ describe("workspace", () => {
 
             await commandRegistrationPromise;
 
-            // ...otherwise this call will fail.
-            api.sendNotification(
-                ["ExtHostCommands", "$executeContributedCommand", ["extension.showWorkspaceRootPath"]]
-            );
+            api.executeContributedCommand("extension.showWorkspaceRootPath");
 
             await showMessagePromise;
         });
@@ -47,9 +44,7 @@ describe("workspace", () => {
 
             await commandRegistrationPromise;
 
-            api.sendNotification(
-                ["ExtHostCommands", "$executeContributedCommand", ["extension.showWorkspaceRootPath"]]
-            );
+            api.executeContributedCommand("extension.showWorkspaceRootPath");
 
             await initialWorkspaceLoadMessage;
 
@@ -72,9 +67,7 @@ describe("workspace", () => {
                 return args[1] == '/some/other/folder' || /* Windows */ args[1] == '\\some\\other\\folder';
             });
 
-            api.sendNotification(
-                ["ExtHostCommands", "$executeContributedCommand", ["extension.showWorkspaceRootPath"]]
-            );
+            api.executeContributedCommand("extension.showWorkspaceRootPath");
 
             await newWorkspaceMessage;
         });

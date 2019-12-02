@@ -90,6 +90,8 @@ export interface IExtensionHost {
     createDocument: (uri: any, lines: string[], modeId: string) => void;
     updateDocument: (uri: any, range: ChangedEventRange, text: string, version: number) => void;
 
+    executeContributedCommand(id: string);
+
     provideCompletionItems: (handle: number, resource: any, position: any, context: any) => Promise<any>;
 
     onMessage: IEvent<any>;
@@ -288,6 +290,10 @@ export let withExtensionHost = async (extensions: string[], f: apiFunction) => {
         sendNotification(["ExtHostWorkspace", "$acceptWorkspaceData", [workspaceData]]);
     };
 
+    let executeContributedCommand = (id: string) => {
+        sendNotification(["ExtHostCommands", "$executeContributedCommand", [id]]);
+    };
+
     let updateDocument = (uri: any, range: ChangedEventRange, text: string, versionId: number) => {
         let changedEvent = {
             changes: [{
@@ -312,6 +318,7 @@ export let withExtensionHost = async (extensions: string[], f: apiFunction) => {
         waitForMessageOnce,
         acceptWorkspaceData,
         createDocument,
+        executeContributedCommand,
         updateDocument,
         provideCompletionItems,
     };
