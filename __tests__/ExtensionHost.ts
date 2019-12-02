@@ -84,8 +84,13 @@ export interface IExtensionHost {
 
     waitForMessageOnce: (rpcName: string, methodName: string, filter?: filterFunc) => Promise<void>;
 
+    // ExtHostWorkspace
+    acceptWorkspaceData(uri: any, name: string, id: string);
+
     createDocument: (uri: any, lines: string[], modeId: string) => void;
     updateDocument: (uri: any, range: ChangedEventRange, text: string, version: number) => void;
+
+    executeContributedCommand(id: string);
 
     provideCompletionItems: (handle: number, resource: any, position: any, context: any) => Promise<any>;
 
@@ -211,7 +216,6 @@ export let withExtensionHost = async (extensions: string[], f: apiFunction) => {
         await promise;
     };
 
-
     let defaultFilter = (payload: any) => true;
 
     let waitForMessageOnce = (expectedRpc: string, expectedMethod: string, filter: filterFunc = defaultFilter): Promise<void> => {
@@ -289,6 +293,21 @@ export let withExtensionHost = async (extensions: string[], f: apiFunction) => {
 
         sendNotification(["ExtHostDocumentsAndEditors", "$acceptDocumentsAndEditorsDelta", [update]]);
     };
+    
+    let acceptWorkspaceData = (uri: any, name: string, id: string) => {
+        const workspaceData = {
+                id,
+                name,
+                configuration: null,
+                folders: [{ uri, name, id, }]
+            };
+
+        sendNotification(["ExtHostWorkspace", "$acceptWorkspaceData", [workspaceData]]);
+    };
+
+    let executeContributedCommand = (id: string) => {
+        sendNotification(["ExtHostCommands", "$executeContributedCommand", [id]]);
+    };
 
     let updateDocument = (uri: any, range: ChangedEventRange, text: string, versionId: number) => {
         let changedEvent = {
@@ -312,7 +331,9 @@ export let withExtensionHost = async (extensions: string[], f: apiFunction) => {
         sendNotification,
         onMessage: onMessageEvent,
         waitForMessageOnce,
+        acceptWorkspaceData,
         createDocument,
+        executeContributedCommand,
         updateDocument,
         provideCompletionItems,
     };
