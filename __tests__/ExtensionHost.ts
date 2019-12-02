@@ -179,7 +179,22 @@ export let withExtensionHost = async (extensions: string[], f: apiFunction) => {
         connection.sendNotification(outgoingNotification, {
             type: 4, /* RequestJSONArgs */
             reqId: 2,
-            payload: ["ExtHostConfiguration", "$initializeConfiguration", [{}]],
+            payload: ["ExtHostConfiguration", "$initializeConfiguration", [{
+                defaults: {
+                    contents: {
+                        suggest: {
+                            enabled: true
+                        }
+                    },
+                    keys: ["suggest.enabled"],
+                    overrides: [],
+                },
+                user: {},
+                workspace: {},
+                folders: {},
+                isComplete: true,
+                configurationScopes: {},
+            }]],
         });
 
         connection.sendNotification(outgoingNotification, {

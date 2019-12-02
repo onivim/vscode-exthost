@@ -56,19 +56,8 @@ export class ExtHostConfiguration implements ExtHostConfigurationShape {
 		return this._barrier.wait().then(_ => this._actual!);
 	}
 
-	// TODO ONIVIM2: Set up configuration model from host
-	// $initializeConfiguration(data: IConfigurationInitData): void {
-	$initializeConfiguration(): void {
-		let testData: IConfigurationInitData = {
-			defaults: new ConfigurationModel(),
-			user: new ConfigurationModel(),
-			workspace: new ConfigurationModel(),
-			folders: {},
-			configurationScopes: {},
-			isComplete: true,
-		}
-
-		this._actual = new ExtHostConfigProvider(this._proxy, this._extHostWorkspace, testData);
+	 $initializeConfiguration(data: IConfigurationInitData): void {
+		this._actual = new ExtHostConfigProvider(this._proxy, this._extHostWorkspace, data);
 		this._barrier.open();
 	}
 
