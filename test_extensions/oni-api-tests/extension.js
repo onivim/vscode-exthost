@@ -59,6 +59,12 @@ function activate(context) {
 		vscode.window.showInformationMessage(vscode.workspace.rootPath);
 	});
 
+    let disposable6 = vscode.workspace.onDidChangeWorkspaceFolders((wf) => {
+     const addedCount = wf.added.length;
+     const removedCount = wf.removed.length;
+     vscode.window.showInformationMessage(`workspace changed:${addedCount}|${removedCount}`);
+    });
+
 	context.subscriptions.push(disposable);
     context.subscriptions.push(disposable2);
     context.subscriptions.push(disposable3);
