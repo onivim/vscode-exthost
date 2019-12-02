@@ -1,5 +1,5 @@
 {
-	"name": "helloworld-minimal-sample",
+	"name": "oni-api-test",
 	"description": "Minimal HelloWorld example for VS Code",
 	"version": "0.0.1",
 	"publisher": "vscode-samples",
@@ -20,8 +20,25 @@
 			{
 				"command": "extension.showWorkspaceRootPath",
 				"title": "Show workspace root path"
+			},
+			{
+				"command": "config.showSuggestEnabled",
+				"title": "Show workspace root path"
 			}
-		]
+		],
+		"configuration": {
+			"type" : "object",
+			"title": "test configuration",
+			"order": 20,
+			"properties": {
+				"suggest.enabled": {
+				  "type": "boolean",
+				  "default": true,
+				  "description": "description",
+				  "scope": "resource"
+				}	
+			}
+		}
 	},
 	"scripts": {
 		"postinstall": "node ./node_modules/vscode/bin/install"

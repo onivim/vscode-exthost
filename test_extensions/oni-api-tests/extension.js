@@ -58,8 +58,17 @@ function activate(context) {
 		// Display a message box to the user
 		vscode.window.showInformationMessage(vscode.workspace.rootPath);
 	});
+    
+	let disposable6 = vscode.commands.registerCommand('config.showSuggestEnabled', () => {
+            const setting = vscode.workspace.getConfiguration().get("suggest.enabled");
 
-    let disposable6 = vscode.workspace.onDidChangeWorkspaceFolders((wf) => {
+            const settingDisplay = setting != null ? setting.toString() : "null";
+
+		// Display a message box to the user
+		vscode.window.showInformationMessage(settingDisplay);
+	});
+
+    let disposable7 = vscode.workspace.onDidChangeWorkspaceFolders((wf) => {
      const addedCount = wf.added.length;
      const removedCount = wf.removed.length;
      vscode.window.showInformationMessage(`workspace changed:${addedCount}|${removedCount}`);
@@ -70,6 +79,8 @@ function activate(context) {
     context.subscriptions.push(disposable3);
     context.subscriptions.push(disposable4);
     context.subscriptions.push(disposable5);
+    context.subscriptions.push(disposable6);
+    context.subscriptions.push(disposable7);
 }
 
 // this method is called when your extension is deactivated
