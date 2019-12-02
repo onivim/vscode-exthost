@@ -51,11 +51,25 @@ function activate(context) {
             fullText: e.document.getText(),
         });
     });
+    
+	let disposable5 = vscode.commands.registerCommand('extension.showWorkspaceRootPath', () => {
+		// The code you place here will be executed every time your command is executed
+
+		// Display a message box to the user
+		vscode.window.showInformationMessage(vscode.workspace.rootPath);
+	});
+
+    let disposable6 = vscode.workspace.onDidChangeWorkspaceFolders((wf) => {
+     const addedCount = wf.added.length;
+     const removedCount = wf.removed.length;
+     vscode.window.showInformationMessage(`workspace changed:${addedCount}|${removedCount}`);
+    });
 
 	context.subscriptions.push(disposable);
     context.subscriptions.push(disposable2);
     context.subscriptions.push(disposable3);
     context.subscriptions.push(disposable4);
+    context.subscriptions.push(disposable5);
 }
 
 // this method is called when your extension is deactivated

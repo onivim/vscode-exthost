@@ -84,8 +84,13 @@ export interface IExtensionHost {
 
     waitForMessageOnce: (rpcName: string, methodName: string, filter?: filterFunc) => Promise<void>;
 
+    // ExtHostWorkspace
+    acceptWorkspaceData(uri: any, name: string, id: string);
+
     createDocument: (uri: any, lines: string[], modeId: string) => void;
     updateDocument: (uri: any, range: ChangedEventRange, text: string, version: number) => void;
+
+    executeContributedCommand(id: string);
 
     provideCompletionItems: (handle: number, resource: any, position: any, context: any) => Promise<any>;
 
@@ -170,7 +175,7 @@ export let withExtensionHost = async (extensions: string[], f: apiFunction) => {
                 environment: {
                     globalStorageHomePath: require("os").tmpdir(),
                 },
-                workspace: {},
+                workspace: {name: "test", path: "/Users/bryphe/test", id: "testId"},
                 logsLocationPath: require("os").tmpdir(),
                 autoStart: true,
             }
@@ -189,13 +194,12 @@ export let withExtensionHost = async (extensions: string[], f: apiFunction) => {
                 id: "workspace-test",
                 name: "workspace-test",
                 configuration: null,
-                folders: [],
+                folders: [{ uri: {path: "/some/folder", scheme: "file"}, name: "workspace-test-1", id: "workspace-test-1"}],
             }]],
         });
 
         await promise;
     };
-
 
     let defaultFilter = (payload: any) => true;
 
@@ -274,6 +278,21 @@ export let withExtensionHost = async (extensions: string[], f: apiFunction) => {
 
         sendNotification(["ExtHostDocumentsAndEditors", "$acceptDocumentsAndEditorsDelta", [update]]);
     };
+    
+    let acceptWorkspaceData = (uri: any, name: string, id: string) => {
+        const workspaceData = {
+                id,
+                name,
+                configuration: null,
+                folders: [{ uri, name, id, }]
+            };
+
+        sendNotification(["ExtHostWorkspace", "$acceptWorkspaceData", [workspaceData]]);
+    };
+
+    let executeContributedCommand = (id: string) => {
+        sendNotification(["ExtHostCommands", "$executeContributedCommand", [id]]);
+    };
 
     let updateDocument = (uri: any, range: ChangedEventRange, text: string, versionId: number) => {
         let changedEvent = {
@@ -297,7 +316,9 @@ export let withExtensionHost = async (extensions: string[], f: apiFunction) => {
         sendNotification,
         onMessage: onMessageEvent,
         waitForMessageOnce,
+        acceptWorkspaceData,
         createDocument,
+        executeContributedCommand,
         updateDocument,
         provideCompletionItems,
     };

@@ -5,7 +5,7 @@ import * as ExtensionHost from "./ExtensionHost";
 let extensionPath = path.join(__dirname, "..", "test_extensions", "oni-api-tests", "package.json");
 
 describe("commands", () => {
-    test.only("execute basic command", async () => {
+    test("execute basic command", async () => {
         await ExtensionHost.withExtensionHost([extensionPath], async (api) => {
 
             /*

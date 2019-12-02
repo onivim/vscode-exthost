@@ -16,6 +16,10 @@
 			{
 				"command": "extension.helloWorld",
 				"title": "Hello World"
+			},
+			{
+				"command": "extension.showWorkspaceRootPath",
+				"title": "Show workspace root path"
 			}
 		]
 	},
