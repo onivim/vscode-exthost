@@ -15,7 +15,7 @@ describe("workspace", () => {
 
             let showMessagePromise = api.waitForMessageOnce("MainThreadMessageService", "$showMessage", (args) => {
                 console.log("MESSAGE: " + args[1]);
-                return args[1] == '/some/folder';
+                return args[1] == '/some/folder' || /* Windows */ args[1] == '\\some\\folder';
             });
 
             await api.start();
