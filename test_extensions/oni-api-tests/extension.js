@@ -62,7 +62,7 @@ function activate(context) {
 	let disposable6 = vscode.commands.registerCommand('config.showSuggestEnabled', () => {
             const setting = vscode.workspace.getConfiguration().get("suggest.enabled");
 
-            const settingDisplay = setting ? setting.toString() : "null";
+            const settingDisplay = setting != null ? setting.toString() : "null";
 
 		// Display a message box to the user
 		vscode.window.showInformationMessage(settingDisplay);

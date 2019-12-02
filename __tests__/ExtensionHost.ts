@@ -87,6 +87,9 @@ export interface IExtensionHost {
     // ExtHostWorkspace
     acceptWorkspaceData(uri: any, name: string, id: string);
 
+    // ExtHostConfiguration
+    acceptConfigurationChanged(data: any, configurationChangeData: any);
+
     createDocument: (uri: any, lines: string[], modeId: string) => void;
     updateDocument: (uri: any, range: ChangedEventRange, text: string, version: number) => void;
 
@@ -305,6 +308,10 @@ export let withExtensionHost = async (extensions: string[], f: apiFunction) => {
         sendNotification(["ExtHostWorkspace", "$acceptWorkspaceData", [workspaceData]]);
     };
 
+    let acceptConfigurationChanged = (configuration: any, changeEvent: any) => {
+        sendNotification(["ExtHostConfiguration", "$acceptConfigurationChanged", [configuration, changeEvent]]);
+    };
+
     let executeContributedCommand = (id: string) => {
         sendNotification(["ExtHostCommands", "$executeContributedCommand", [id]]);
     };
@@ -332,6 +339,7 @@ export let withExtensionHost = async (extensions: string[], f: apiFunction) => {
         onMessage: onMessageEvent,
         waitForMessageOnce,
         acceptWorkspaceData,
+        acceptConfigurationChanged,
         createDocument,
         executeContributedCommand,
         updateDocument,
