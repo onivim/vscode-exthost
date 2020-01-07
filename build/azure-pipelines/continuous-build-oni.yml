@@ -1,7 +1,7 @@
 steps:
 - task: NodeTool@0
   inputs:
-    versionSpec: "10.15.1"
+    versionSpec: "10.x"
 - powershell: |
     npm install -g jest@24.5.0
   displayName: Install jest
