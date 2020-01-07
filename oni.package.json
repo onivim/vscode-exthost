@@ -14,7 +14,8 @@
     "graceful-fs": "4.1.11",
     "iconv-lite": "0.4.23",
     "semver": "^5.5.0",
-    "vscode-jsonrpc": "4.0.0"
+    "vscode-jsonrpc": "4.0.0",
+    "node-pty": "0.8.1"
   },
   "devDependencies": {
   },
