@@ -3,13 +3,13 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-// import * as os from 'os';
-// import * as path from 'vs/base/common/path';
+import * as os from 'os';
+import * as path from 'vs/base/common/path';
 import * as platform from 'vs/base/common/platform';
-// import * as pty from 'node-pty';
+import * as pty from 'node-pty';
 import * as fs from 'fs';
 import { Event, Emitter } from 'vs/base/common/event';
-// import { getWindowsBuildNumber } from 'vs/workbench/contrib/terminal/node/terminal';
+import { getWindowsBuildNumber } from 'vs/workbench/contrib/terminal/node/terminal';
 import { IDisposable } from 'vs/base/common/lifecycle';
 import { IShellLaunchConfig, ITerminalChildProcess } from 'vs/workbench/contrib/terminal/common/terminal';
 import { exec } from 'child_process';
@@ -17,7 +17,7 @@ import { exec } from 'child_process';
 export class TerminalProcess implements ITerminalChildProcess, IDisposable {
 	private _exitCode: number;
 	private _closeTimeout: any;
-	private _ptyProcess: any;
+	private _ptyProcess: pty.IPty;
 	private _currentTitle: string = '';
 	private _processStartupComplete: Promise<void>;
 	private _isDisposed: boolean = false;
@@ -41,28 +41,28 @@ export class TerminalProcess implements ITerminalChildProcess, IDisposable {
 		env: platform.IProcessEnvironment,
 		windowsEnableConpty: boolean
 	) {
-		// let shellName: string;
-		// if (os.platform() === 'win32') {
-		// 	shellName = path.basename(shellLaunchConfig.executable || '');
-		// } else {
-		// 	// Using 'xterm-256color' here helps ensure that the majority of Linux distributions will use a
-		// 	// color prompt as defined in the default ~/.bashrc file.
-		// 	shellName = 'xterm-256color';
-		// }
+		let shellName: string;
+		if (os.platform() === 'win32') {
+			shellName = path.basename(shellLaunchConfig.executable || '');
+		} else {
+			// Using 'xterm-256color' here helps ensure that the majority of Linux distributions will use a
+			// color prompt as defined in the default ~/.bashrc file.
+			shellName = 'xterm-256color';
+		}
 
 		this._initialCwd = cwd;
-		// const useConpty = windowsEnableConpty && process.platform === 'win32' && getWindowsBuildNumber() >= 18309;
-		// const options: any/*pty.IPtyForkOptions*/ = {
-		// 	name: shellName,
-		// 	cwd,
-		// 	env,
-		// 	cols,
-		// 	rows,
-		// 	experimentalUseConpty: useConpty
-		// };
+		const useConpty = windowsEnableConpty && process.platform === 'win32' && getWindowsBuildNumber() >= 18309;
+		const options: pty.IPtyForkOptions = {
+			name: shellName,
+			cwd,
+			env,
+			cols,
+			rows,
+			experimentalUseConpty: useConpty
+		};
 
 		try {
-			this._ptyProcess = /*pty.spawn(shellLaunchConfig.executable!, shellLaunchConfig.args || [], options);*/ null;
+			this._ptyProcess = pty.spawn(shellLaunchConfig.executable!, shellLaunchConfig.args || [], options);
 			this._processStartupComplete = new Promise<void>(c => {
 				this.onProcessIdReady((pid) => {
 					c();
