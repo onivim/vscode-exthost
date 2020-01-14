@@ -141,7 +141,8 @@ function darwinBundleDocumentType(extensions, icon) {
 }
 
 const config = {
-	version: getElectronVersion(),
+	//version: getElectronVersion(),
+	version: "9.9.9",
 	productAppName: product.nameLong,
 	companyName: 'Microsoft Corporation',
 	copyright: 'Copyright (C) 2019 Microsoft. All rights reserved',
