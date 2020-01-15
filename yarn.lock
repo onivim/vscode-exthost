@@ -3498,11 +3498,6 @@ gauge@~2.7.3:
     strip-ansi "^3.0.1"
     wide-align "^1.1.0"
 
-gc-signals@^0.0.2:
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/gc-signals/-/gc-signals-0.0.2.tgz#1cfa8a00adecaeeb93ea0dda72dad9e9f333e62f"
-  integrity sha512-Ghj4Co6x5bd3dvbAFuiDc6gN+BVK8ic8CBn70dXjzrtbC5hq4a+s4S6acEvftMP7LcQuHKN5v+30PGXhkCLoCQ==
-
 generate-function@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/generate-function/-/generate-function-2.0.0.tgz#6858fe7c0969b7d4e9093337647ac79f60dfbe74"
@@ -5926,11 +5921,6 @@ native-keymap@1.2.5:
   version "1.2.5"
   resolved "https://registry.yarnpkg.com/native-keymap/-/native-keymap-1.2.5.tgz#1035a9417b9a9340cf8097763a43c76d588165a5"
   integrity sha1-EDWpQXuak0DPgJd2OkPHbViBZaU=
-
-native-watchdog@1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/native-watchdog/-/native-watchdog-1.0.0.tgz#97344e83cd6815a8c8e6c44a52e7be05832e65ca"
-  integrity sha512-HKQATz5KLUMPyQQ/QaalzgTXaGz2plYPBxjyalaR4ECIu/UznXY8YJD+a9SLkkcvtxnJ8/zHLY3xik06vUZ7uA==
 
 natural-compare@^1.4.0:
   version "1.4.0"
