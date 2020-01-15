@@ -30,7 +30,6 @@
   },
   "dependencies": {
     "applicationinsights": "1.0.8",
-    "gc-signals": "^0.0.2",
     "getmac": "1.4.1",
     "graceful-fs": "4.1.11",
     "http-proxy-agent": "^2.1.0",
@@ -41,7 +40,6 @@
     "minimist": "1.2.0",
     "native-is-elevated": "^0.2.1",
     "native-keymap": "1.2.5",
-    "native-watchdog": "1.0.0",
     "node-pty": "0.8.1",
     "semver": "^5.5.0",
     "spdlog": "0.7.2",
