@@ -431,6 +431,7 @@ export class ExtHostTerminalService implements ExtHostTerminalServiceShape {
 	}
 
 	public async $createProcess(id: number, shellLaunchConfigDto: ShellLaunchConfigDto, activeWorkspaceRootUriComponents: UriComponents, cols: number, rows: number): Promise<void> {
+		console.error("HELLO, WORLD");
 		const shellLaunchConfig: IShellLaunchConfig = {
 			name: shellLaunchConfigDto.name,
 			executable: shellLaunchConfigDto.executable,
@@ -439,11 +440,16 @@ export class ExtHostTerminalService implements ExtHostTerminalServiceShape {
 			env: shellLaunchConfigDto.env
 		};
 
+		console.error("HERE1");
+
 		// TODO: This function duplicates a lot of TerminalProcessManager.createProcess, ideally
 		// they would be merged into a single implementation.
 		const configProvider = await this._extHostConfiguration.getConfigProvider();
+		console.error("HERE1.5");
 		const terminalConfig = configProvider.getConfiguration('terminal.integrated');
+		console.error("tc: " + JSON.stringify(terminalConfig));
 
+		console.error("HERE2");
 		if (!shellLaunchConfig.executable) {
 			// TODO: This duplicates some of TerminalConfigHelper.mergeDefaultShellPathAndArgs and should be merged
 			// this._configHelper.mergeDefaultShellPathAndArgs(shellLaunchConfig);
@@ -455,18 +461,23 @@ export class ExtHostTerminalService implements ExtHostTerminalServiceShape {
 			shellLaunchConfig.executable = shellConfigValue;
 			shellLaunchConfig.args = shellArgsConfigValue;
 		}
+		console.error("HERE3");
 
 		// TODO: @daniel
 		const activeWorkspaceRootUri = URI.revive(activeWorkspaceRootUriComponents);
 		const initialCwd = terminalEnvironment.getCwd(shellLaunchConfig, os.homedir(), activeWorkspaceRootUri, terminalConfig.cwd);
 
+		console.error("HERE4");
 		// TODO: Pull in and resolve config settings
 		// // Resolve env vars from config and shell
 		// const lastActiveWorkspaceRoot = this._workspaceContextService.getWorkspaceFolder(lastActiveWorkspaceRootUri);
-		const platformKey = platform.isWindows ? 'windows' : (platform.isMacintosh ? 'osx' : 'linux');
+		//const platformKey = platform.isWindows ? 'windows' : (platform.isMacintosh ? 'osx' : 'linux');
 		// const envFromConfig = terminalEnvironment.resolveConfigurationVariables(this._configurationResolverService, { ...terminalConfig.env[platformKey] }, lastActiveWorkspaceRoot);
-		const envFromConfig = { ...terminalConfig.env[platformKey] };
+		// TODO: Revert
+		// const envFromConfig = { ...terminalConfig.env[platformKey] };
+		const envFromConfig = {};
 		// const envFromShell = terminalEnvironment.resolveConfigurationVariables(this._configurationResolverService, { ...shellLaunchConfig.env }, lastActiveWorkspaceRoot);
+		console.error("HERE4.5");
 
 		// Merge process env with the env from config
 		const env = { ...process.env };
@@ -476,12 +487,15 @@ export class ExtHostTerminalService implements ExtHostTerminalServiceShape {
 		// Sanitize the environment, removing any undesirable VS Code and Electron environment
 		// variables
 		sanitizeProcessEnvironment(env, 'VSCODE_IPC_HOOK_CLI');
+		console.error("HERE5");
 
 		// Continue env initialization, merging in the env from the launch
 		// config and adding keys that are needed to create the process
+		console.error("pkg:version " + pkg);
 		terminalEnvironment.addTerminalEnvironmentKeys(env, pkg.version, platform.locale, terminalConfig.get('setLocaleVariables'));
 
 		// Fork the process and listen for messages
+		console.error("Got all the way here");
 		this._logService.debug(`Terminal process launching on ext host`, shellLaunchConfig, initialCwd, cols, rows, env);
 		const p = new TerminalProcess(shellLaunchConfig, initialCwd, cols, rows, env, terminalConfig.get('windowsEnableConpty'));
 		p.onProcessIdReady(pid => this._proxy.$sendProcessPid(id, pid));
