@@ -497,10 +497,14 @@ export class ExtHostTerminalService implements ExtHostTerminalServiceShape {
 		// Fork the process and listen for messages
 		console.error("Got all the way here");
 		this._logService.debug(`Terminal process launching on ext host`, shellLaunchConfig, initialCwd, cols, rows, env);
-		const p = new TerminalProcess(shellLaunchConfig, initialCwd, cols, rows, env, terminalConfig.get('windowsEnableConpty'));
+		// TODO:  Bring back `terminalConfig.get('windowsEnableConpty'));`
+		// When running as a node process, if true, this will push output to stdout and not giving `onProcessData` a chance to intercept
+		const p = new TerminalProcess(shellLaunchConfig, initialCwd, cols, rows, env, /* windowsEnableConpty */ false);
 		p.onProcessIdReady(pid => this._proxy.$sendProcessPid(id, pid));
 		p.onProcessTitleChanged(title => this._proxy.$sendProcessTitle(id, title));
-		p.onProcessData(data => this._proxy.$sendProcessData(id, data));
+		p.onProcessData(data => {
+			this._proxy.$sendProcessData(id, data)
+		});
 		p.onProcessExit((exitCode) => this._onProcessExit(id, exitCode));
 		this._terminalProcesses[id] = p;
 	}
