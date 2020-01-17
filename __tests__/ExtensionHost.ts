@@ -197,13 +197,15 @@ export let withExtensionHost = async (extensions: string[], f: apiFunction) => {
                         },
                         terminal: {
                             integrated: {
-                                windows: null,
-                                linux: null,
-                                osx: null,
+                                env: {
+                                    windows: null,
+                                    linux: null,
+                                    osx: null,
+                                }
                             }
                         }
                     },
-                    keys: ["suggest.enabled", "terminal.integrated.windows", "terminal.integrated.osx", "terminal.integrated.linux"],
+                    keys: ["suggest.enabled", "terminal.integrated"],
                     overrides: [],
                 },
                 user: {},

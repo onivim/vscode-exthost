@@ -443,6 +443,7 @@ export class ExtHostTerminalService implements ExtHostTerminalServiceShape {
 		// they would be merged into a single implementation.
 		const configProvider = await this._extHostConfiguration.getConfigProvider();
 		const terminalConfig = configProvider.getConfiguration('terminal.integrated');
+		console.error("TERMINAL CONFIG: " + JSON.stringify(terminalConfig));
 
 		if (!shellLaunchConfig.executable) {
 			// TODO: This duplicates some of TerminalConfigHelper.mergeDefaultShellPathAndArgs and should be merged
@@ -466,7 +467,7 @@ export class ExtHostTerminalService implements ExtHostTerminalServiceShape {
 		const platformKey = platform.isWindows ? 'windows' : (platform.isMacintosh ? 'osx' : 'linux');
 		//const envFromConfig = terminalEnvironment.resolveConfigurationVariables(this._configurationResolverService, { ...terminalConfig.env[platformKey] }, lastActiveWorkspaceRoot);
 		const envFromConfig = { ...terminalConfig.env[platformKey] };
-		//const envFromConfig = {};
+		
 		// const envFromShell = terminalEnvironment.resolveConfigurationVariables(this._configurationResolverService, { ...shellLaunchConfig.env }, lastActiveWorkspaceRoot);
 
 		// Merge process env with the env from config
