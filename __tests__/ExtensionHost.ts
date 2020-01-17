@@ -194,9 +194,16 @@ export let withExtensionHost = async (extensions: string[], f: apiFunction) => {
                     contents: {
                         suggest: {
                             enabled: true
+                        },
+                        terminal: {
+                            integrated: {
+                                windows: null,
+                                linux: null,
+                                osx: null,
+                            }
                         }
                     },
-                    keys: ["suggest.enabled"],
+                    keys: ["suggest.enabled", "terminal.integrated.windows", "terminal.integrated.osx", "terminal.integrated.linux"],
                     overrides: [],
                 },
                 user: {},
@@ -342,7 +349,7 @@ export let withExtensionHost = async (extensions: string[], f: apiFunction) => {
                 id,
                 terminalOptions,
                 { 
-                    // TODO: Working director
+                    // TODO: Working directory
                 },
                 20,
                 20,
