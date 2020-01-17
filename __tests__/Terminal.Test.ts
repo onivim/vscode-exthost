@@ -5,23 +5,12 @@ import * as ExtensionHost from "./ExtensionHost";
 let extensionPath = path.join(__dirname, "..", "test_extensions", "oni-api-tests", "package.json");
 
 describe("Terminal", () => {
-    test("Verify we get a response for a command that does not exist", async () => {
+    test("Verify we get a $sendProcessExit for a command that does not exist", async () => {
         await ExtensionHost.withExtensionHost([extensionPath], async (api) => {
 
-            /*
-             * Upon activation, we should get a notification from the extension host
-             */
-            let commandRegistrationPromise = api.waitForMessageOnce("MainThreadCommands", "$registerCommand", (args) => args.indexOf("config.showSuggestEnabled") >= 0);
-
-            let terminalSendProcessTitle = 
-            api.waitForMessageOnce("MainThreadTerminalService", "$sendProcessTitle", (args) => {
-                console.log("$sendProcessTitle: " + args[1]);
-                return true;
-            });
-
-            let terminalSendProcessData = 
-            api.waitForMessageOnce("MainThreadTerminalService", "$sendProcessData", (args) => {
-                console.log("$sendProcessData: " + args[1]);
+            let terminalSendProcessExit = 
+            api.waitForMessageOnce("MainThreadTerminalService", "$sendProcessExit", (args) => {
+                console.log("$sendProcessExit: " + args[1]);
                 return true;
             });
 
@@ -35,8 +24,7 @@ describe("Terminal", () => {
             20, 
             20);
 
-            await terminalSendProcessTitle;
-            await terminalSendProcessData;
+            await terminalSendProcessExit;
         });
     });
 });
