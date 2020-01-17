@@ -9,7 +9,7 @@ import { registerSingleton } from 'vs/platform/instantiation/common/extensions';
 import { Event, Emitter } from 'vs/base/common/event';
 import { IDisposable } from 'vs/base/common/lifecycle';
 import { extHostCustomer } from 'vs/workbench/api/electron-browser/extHostCustomers';
-//import { GCSignal } from 'gc-signals';
+import { GCSignal } from 'gc-signals';
 
 export const IHeapService = createDecorator<IHeapService>('heapService');
 
@@ -35,7 +35,7 @@ export class HeapService implements IHeapService {
 	private _activeIds = new Set<number>();
 
 	private _consumeHandle: any;
-	private _ctor: { new(id: number): any };
+	private _ctor: { new(id: number): GCSignal };
 	private _ctorInit: Promise<void>;
 
 	constructor() {
@@ -68,7 +68,7 @@ export class HeapService implements IHeapService {
 		} else {
 			// make sure to load gc-signals, then track and leave
 			if (!this._ctorInit) {
-				/*this._ctorInit = import('gc-signals').then(({ GCSignal, consumeSignals }) => {
+				this._ctorInit = import('gc-signals').then(({ GCSignal, consumeSignals }) => {
 					this._ctor = GCSignal;
 					this._consumeHandle = setInterval(() => {
 						const ids = consumeSignals();
@@ -82,13 +82,13 @@ export class HeapService implements IHeapService {
 							this._onGarbageCollection.fire(ids);
 						}
 					}, 15 * 1000);
-				});*/
+				});
 			}
 
-			/*this._ctorInit.then(() => {
+			this._ctorInit.then(() => {
 				this._activeIds.add(ident);
 				this._activeSignals.set(obj, new this._ctor(ident));
-			});*/
+			});
 		}
 	}
 }
