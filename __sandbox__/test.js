@@ -77,9 +77,18 @@ let run = async () => {
                     contents: {
                         suggest: {
                             enabled: true
-                        }
+                        },
+                        terminal: {
+                            integrated: {
+                                env: {
+                                    windows: {},
+                                    linux: {},
+                                    osx: {},
+                                }
+                            }
+                    }
                     },
-                    keys: ["suggest.enabled"],
+                    keys: ["suggest.enabled", "terminal.integrated"],
                     overrides: [],
                 },
                 user: {},
@@ -121,11 +130,11 @@ let run = async () => {
             payload: ["ExtHostTerminalService", "$createProcess", [
                     1, {
                         name: "Terminal 1",
-                        executable: "/bin/bash",
+                        executable: "/non-existent-item",
                         args: [],
                     },{
-                        scheme: "file",
-                        path: "/Users/bryphe"
+                        //scheme: "file",
+                        //path: "/Users/bryphe"
                     },
                     20,
                     20
