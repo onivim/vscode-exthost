@@ -27,4 +27,54 @@ describe("Terminal", () => {
             await terminalSendProcessExit;
         });
     });
+    
+    test("Verify we get a $sendProcessData / $sendProcessTitle for a command that works", async () => {
+        await ExtensionHost.withExtensionHost([extensionPath], async (api) => {
+            let terminalSendProcessTitle = 
+                api.waitForMessageOnce("MainThreadTerminalService", "$sendProcessTitle", (args) => {
+                    console.log("$sendProcessTitle: " + args[1]);
+                    return true;
+                });
+            
+            let terminalSendProcessData = 
+                api.waitForMessageOnce("MainThreadTerminalService", "$sendProcessData", (args) => {
+                    console.log("$sendProcessData: " + args[1]);
+                    return true;
+                });
+
+            let terminalSendProcessExit = 
+                api.waitForMessageOnce("MainThreadTerminalService", "$sendProcessExit", (args) => {
+                    console.log("$sendProcessExit: " + args[1]);
+                    return true;
+                });
+
+            let terminalArgs: any = null;
+            if(process.platform == "win32") {
+               terminalArgs = {
+                name: "Windows Terminal",
+                executable: "cmd.exe",
+                args: ["/c", "echo", "hello"]
+               }
+            } else {
+    
+               terminalArgs = {
+                name: "Bash Terminal",
+                executable: "bash",
+                args: ["-c", "echo hello"]
+               }
+            }
+
+            await api.start();
+
+            api.terminalCreateProcess(
+                1,
+                terminalArgs,
+                20, 
+                20);
+
+            await terminalSendProcessTitle;
+            await terminalSendProcessData;
+            await terminalSendProcessExit;
+        });
+    });
 });
