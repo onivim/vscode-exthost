@@ -85,17 +85,19 @@ export interface IExtensionHost {
     waitForMessageOnce: (rpcName: string, methodName: string, filter?: filterFunc) => Promise<void>;
 
     // ExtHostWorkspace
-    acceptWorkspaceData(uri: any, name: string, id: string);
+    acceptWorkspaceData: (uri: any, name: string, id: string) => any;
 
     // ExtHostConfiguration
-    acceptConfigurationChanged(data: any, configurationChangeData: any);
+    acceptConfigurationChanged: (data: any, configurationChangeData: any) => any;
 
     createDocument: (uri: any, lines: string[], modeId: string) => void;
     updateDocument: (uri: any, range: ChangedEventRange, text: string, version: number) => void;
 
-    executeContributedCommand(id: string);
+    executeContributedCommand: (id: string) => any;
 
     provideCompletionItems: (handle: number, resource: any, position: any, context: any) => Promise<any>;
+
+    terminalCreateProcess: (id: number, terminalOptions: any, width: number, height: number) => void;
 
     onMessage: IEvent<any>;
 }
@@ -192,9 +194,18 @@ export let withExtensionHost = async (extensions: string[], f: apiFunction) => {
                     contents: {
                         suggest: {
                             enabled: true
+                        },
+                        terminal: {
+                            integrated: {
+                                env: {
+                                    windows: null,
+                                    linux: null,
+                                    osx: null,
+                                }
+                            }
                         }
                     },
-                    keys: ["suggest.enabled"],
+                    keys: ["suggest.enabled", "terminal.integrated"],
                     overrides: [],
                 },
                 user: {},
@@ -332,6 +343,21 @@ export let withExtensionHost = async (extensions: string[], f: apiFunction) => {
     let provideCompletionItems = (handle: number, resource: any, position: any, context: any) => {
         return sendRequestWithCancellation(["ExtHostLanguageFeatures", "$provideCompletionItems", [handle, resource, position, context]]);
     };
+    let terminalCreateProcess = (id: number, terminalOptions: any, width: number, height: number) => {
+        sendNotification([
+            "ExtHostTerminalService",
+            "$createProcess",
+            [
+                id,
+                terminalOptions,
+                { 
+                    // TODO: Working directory
+                },
+                20,
+                20,
+            ]
+        ]);
+    };
 
     let extHost = {
         start,
@@ -344,6 +370,7 @@ export let withExtensionHost = async (extensions: string[], f: apiFunction) => {
         executeContributedCommand,
         updateDocument,
         provideCompletionItems,
+        terminalCreateProcess,
     };
 
     await f(extHost);

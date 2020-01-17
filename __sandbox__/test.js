@@ -72,7 +72,32 @@ let run = async () => {
     connection.sendNotification(extMessage, {
         type: 4, /* RequestJSONArgs */
         reqId: 2,
-        payload: ["ExtHostConfiguration", "$initializeConfiguration", [{}]],
+        payload: ["ExtHostConfiguration", "$initializeConfiguration", [{
+                defaults: {
+                    contents: {
+                        suggest: {
+                            enabled: true
+                        },
+                        terminal: {
+                            integrated: {
+                                env: {
+                                    windows: {},
+                                    linux: {},
+                                    osx: {},
+                                }
+                            }
+                    }
+                    },
+                    keys: ["suggest.enabled", "terminal.integrated"],
+                    overrides: [],
+                },
+                user: {},
+                workspace: {},
+                folders: {},
+                isComplete: true,
+                configurationScopes: {},
+    
+        }]],
     });
 
     connection.sendNotification(extMessage, {
@@ -96,6 +121,34 @@ let run = async () => {
     // }, 1000);
 
 
+    setTimeout(() => {
+    
+        console.log("SENDING MESSAGE");
+        connection.sendNotification(extMessage, {
+            type: 4,
+            reqId: 3,
+            payload: ["ExtHostTerminalService", "$createProcess", [
+                    1, {
+                        name: "Terminal 1",
+                        executable: "/non-existent-item",
+                        args: [],
+                    },{
+                        //scheme: "file",
+                        //path: "/Users/bryphe"
+                    },
+                    20,
+                    20
+            ]]
+        });
+        connection.sendNotification(extMessage, {
+            type: 4,
+            reqId: 3,
+            payload: ["ExtHostTerminalService", "$acceptProcessInput", [
+                    1, "git status\n"
+            ]]
+        });
+    }, 2000);
+
     let testModelAdded = {
         uri: {
             scheme: "file",
@@ -116,7 +169,7 @@ let run = async () => {
     };
 
 
-    setTimeout(() => {
+    /*setTimeout(() => {
         connection.sendNotification(extMessage, {
             type: 4,
             reqId: 3,
@@ -148,7 +201,7 @@ let run = async () => {
                 true,
             ]],
         });
-    }, 2000);
+    }, 2000);*/
 
     let closePromise = new Promise((c) => {
         connection.onClose(() => c());

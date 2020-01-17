@@ -174,7 +174,8 @@ async function ensureVersionAndSymbols(options: IOptions) {
 const pakage = require('../../../package.json');
 const product = require('../../../product.json');
 const repository = product.electronRepository;
-const electronVersion = require('../../lib/electron').getElectronVersion();
+// Onivim: We're running via Node, not electron
+const electronVersion = "?.?.?";
 const insiders = product.quality !== 'stable';
 let codeVersion = pakage.version;
 if (insiders) {
