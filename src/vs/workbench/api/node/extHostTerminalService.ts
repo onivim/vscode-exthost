@@ -443,7 +443,6 @@ export class ExtHostTerminalService implements ExtHostTerminalServiceShape {
 		// they would be merged into a single implementation.
 		const configProvider = await this._extHostConfiguration.getConfigProvider();
 		const terminalConfig = configProvider.getConfiguration('terminal.integrated');
-		console.error("TERMINAL CONFIG: " + JSON.stringify(terminalConfig));
 
 		if (!shellLaunchConfig.executable) {
 			// TODO: This duplicates some of TerminalConfigHelper.mergeDefaultShellPathAndArgs and should be merged
