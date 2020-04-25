@@ -11,10 +11,18 @@ jobs:
   pool:
     vmImage: 'Ubuntu-16.04'
   steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '2.x'
+      addToPath: true
   - template: build/azure-pipelines/continuous-build-oni.yml
 
 - job: macOS
   pool:
     vmImage: macOS 10.14
   steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '2.x'
+      addToPath: true
   - template: build/azure-pipelines/continuous-build-oni.yml
