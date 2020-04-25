@@ -8,17 +8,11 @@
 
 const bootstrap = require('./bootstrap');
 
-// ONIVIM:TODO - Are these necessary to remove?
-
-// ONIVIM:START
 // Remove global paths from the node module lookup
-//bootstrap.removeGlobalNodeModuleLookupPaths();
-// ONIVIM:END
+bootstrap.removeGlobalNodeModuleLookupPaths();
 
-// ONIVIM:START
 // Enable ASAR in our forked processes
-//bootstrap.enableASARSupport();
-// ONIVIM:END
+bootstrap.enableASARSupport();
 
 if (process.env['VSCODE_INJECT_NODE_MODULE_LOOKUP_PATH']) {
 	bootstrap.injectNodeModuleLookupPath(process.env['VSCODE_INJECT_NODE_MODULE_LOOKUP_PATH']);
