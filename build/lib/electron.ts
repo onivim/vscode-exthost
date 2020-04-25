@@ -19,11 +19,14 @@ const root = path.dirname(path.dirname(__dirname));
 const product = JSON.parse(fs.readFileSync(path.join(root, 'product.json'), 'utf8'));
 const commit = util.getVersion(root);
 
-export function getElectronVersion(): string {
-	const yarnrc = fs.readFileSync(path.join(root, '.yarnrc'), 'utf8');
-	const target = /^target "(.*)"$/m.exec(yarnrc)![1];
-	return target;
-}
+// ONIVIM:START
+//export function getElectronVersion(): string {
+//	const yarnrc = fs.readFileSync(path.join(root, '.yarnrc'), 'utf8');
+//	const target = /^target "(.*)"$/m.exec(yarnrc)![1];
+//	return target;
+//}
+const getElectronVersion = () => "9.9.9";
+// ONIVIM:END
 
 const darwinCreditsTemplate = product.darwinCredits && _.template(fs.readFileSync(path.join(root, product.darwinCredits), 'utf8'));
 

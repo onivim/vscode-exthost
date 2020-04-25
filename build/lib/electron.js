@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 'use strict';
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.config = exports.getElectronVersion = void 0;
+exports.config = void 0;
 const fs = require("fs");
 const path = require("path");
 const vfs = require("vinyl-fs");
@@ -16,12 +16,14 @@ const electron = require('gulp-atom-electron');
 const root = path.dirname(path.dirname(__dirname));
 const product = JSON.parse(fs.readFileSync(path.join(root, 'product.json'), 'utf8'));
 const commit = util.getVersion(root);
-function getElectronVersion() {
-    const yarnrc = fs.readFileSync(path.join(root, '.yarnrc'), 'utf8');
-    const target = /^target "(.*)"$/m.exec(yarnrc)[1];
-    return target;
-}
-exports.getElectronVersion = getElectronVersion;
+// ONIVIM:START
+//export function getElectronVersion(): string {
+//	const yarnrc = fs.readFileSync(path.join(root, '.yarnrc'), 'utf8');
+//	const target = /^target "(.*)"$/m.exec(yarnrc)![1];
+//	return target;
+//}
+const getElectronVersion = () => "9.9.9";
+// ONIVIM:END
 const darwinCreditsTemplate = product.darwinCredits && _.template(fs.readFileSync(path.join(root, product.darwinCredits), 'utf8'));
 function darwinBundleDocumentType(extensions, icon) {
     return {
