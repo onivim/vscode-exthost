@@ -1,6 +1,6 @@
 {
 	"name": "@onivim/vscode-exthost",
-	"version": "1.45.0",
+	"version": "1.45.2",
 	"distro": "df7748995d690f8d2022d96c367ead3d686833ff",
 	"author": {
 		"name": "Outrun Labs, LLC"
@@ -15,7 +15,11 @@
 		"iconv-lite": "0.4.23",
 		"semver": "^5.5.0",
 		"vscode-jsonrpc": "4.0.0",
-		"node-pty": "0.8.1"
+		"node-pty": "0.8.1",
+    "spdlog": "^0.11.1",
+    "native-watchdog": "1.3.0",
+		"minimist": "^1.2.5",
+		"vscode-proxy-agent": "^0.5.2"
 	},
 	"devDependencies": {},
 	"repository": {
