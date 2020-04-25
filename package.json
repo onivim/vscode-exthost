@@ -11,6 +11,7 @@
   "scripts": {
     "test": "mocha",
     "test-browser": "node test/unit/browser/index.js",
+    "package:oni": "node build/oni/package.js",
     "preinstall": "node build/npm/preinstall.js",
     "postinstall": "node build/npm/postinstall.js",
     "compile": "gulp compile --max_old_space_size=4095",
@@ -53,7 +54,6 @@
     "v8-inspect-profiler": "^0.0.20",
     "vscode-nsfw": "1.2.8",
     "vscode-proxy-agent": "^0.5.2",
-    "vscode-ripgrep": "^1.5.8",
     "vscode-sqlite3": "4.0.9",
     "vscode-textmate": "4.4.0",
     "xterm": "4.5.0-beta.4",
