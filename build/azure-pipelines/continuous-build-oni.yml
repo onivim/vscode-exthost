@@ -6,8 +6,6 @@ steps:
   inputs:
     versionSpec: '2.x'
     addToPath: true
-- script: npm install -g windows-build-tools
-  displayName: 'npm install -g windows-build-tools'
 - powershell: |
     yarn
   displayName: Install Dependencies
