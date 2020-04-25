@@ -3,8 +3,10 @@ jobs:
   pool:
     vmImage: VS2017-Win2016
   steps:
-  - script: npm install -g windows-build-tools
-    displayName: 'npm install -g windows-build-tools'
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '2.x'
+      addToPath: true
   - template: build/azure-pipelines/continuous-build-oni.yml
 
 - job: Linux
