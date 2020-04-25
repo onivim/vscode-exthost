@@ -202,9 +202,11 @@ class ProtocolReader extends Disposable {
 	}
 
 	public acceptChunk(data: VSBuffer | null): void {
+		console.log("SocketReader::acceptChunk...")
 		if (!data || data.byteLength === 0) {
 			return;
 		}
+		console.log("SocketReader::acceptChunk... reading")
 
 		this.lastReadTime = Date.now();
 
@@ -215,6 +217,7 @@ class ProtocolReader extends Disposable {
 			const buff = this._incomingData.read(this._state.readLen);
 
 			if (this._state.readHead) {
+				console.log("SocketReader::acceptChunk... reading head")
 				// buff is the header
 
 				// save new state => next time will read the body
@@ -223,11 +226,13 @@ class ProtocolReader extends Disposable {
 				this._state.messageType = buff.readUInt8(0);
 				this._state.id = buff.readUInt32BE(1);
 				this._state.ack = buff.readUInt32BE(5);
+				console.log("SocketReader::acceptChunk... length: " + this._state.readLen);
 			} else {
 				// buff is the body
 				const messageType = this._state.messageType;
 				const id = this._state.id;
 				const ack = this._state.ack;
+				console.log("SocketReader::acceptChunk... reading body - msgType: " + messageType);
 
 				// save new state => next time will read the header
 				this._state.readHead = true;
@@ -236,7 +241,9 @@ class ProtocolReader extends Disposable {
 				this._state.id = 0;
 				this._state.ack = 0;
 
+				console.log("SocketReader::acceptChunk... dispatching protocol message")
 				this._onMessage.fire(new ProtocolMessage(messageType, id, ack, buff));
+				console.log("SocketReader::acceptChunk... dispatched!")
 
 				if (this._isDisposed) {
 					// check if an event listener lead to our disposal
@@ -291,8 +298,11 @@ class ProtocolWriter {
 		msg.writtenTime = Date.now();
 		this.lastWriteTime = Date.now();
 		const header = VSBuffer.alloc(ProtocolConstants.HeaderLength);
+		console.log ("- Writing type: " + msg.type);
 		header.writeUInt8(msg.type, 0);
+		console.log ("- Writing id: " + msg.id);
 		header.writeUInt32BE(msg.id, 1);
+		console.log ("- Writing ack: " + msg.ack);
 		header.writeUInt32BE(msg.ack, 5);
 		header.writeUInt32BE(msg.data.byteLength, 9);
 		this._writeSoon(header, msg.data);
@@ -364,7 +374,9 @@ export class Protocol extends Disposable implements IMessagePassingProtocol {
 		this._socketReader = this._register(new ProtocolReader(this._socket));
 
 		this._register(this._socketReader.onMessage((msg) => {
+			console.log("Protocol - onMessage");
 			if (msg.type === ProtocolMessageType.Regular) {
+				console.log("Protocol - onMessage - its regular!");
 				this._onMessage.fire(msg.data);
 			}
 		}));
@@ -751,6 +763,7 @@ export class PersistentProtocol implements IMessagePassingProtocol {
 		const myId = ++this._outgoingMsgId;
 		this._incomingAckId = this._incomingMsgId;
 		const msg = new ProtocolMessage(ProtocolMessageType.Regular, myId, this._incomingAckId, buffer);
+		console.log("Writing message type: " + msg.type);
 		this._outgoingUnackMsg.push(msg);
 		if (!this._isReconnecting) {
 			this._socketWriter.write(msg);

@@ -704,6 +704,7 @@ export class Configuration {
 	}
 
 	static parse(data: IConfigurationData): Configuration {
+		console.log("STRINGIFY: " + JSON.stringify(data));
 		const defaultConfiguration = this.parseConfigurationModel(data.defaults);
 		const userConfiguration = this.parseConfigurationModel(data.user);
 		const workspaceConfiguration = this.parseConfigurationModel(data.workspace);

@@ -187,10 +187,13 @@ async function createExtHostProtocol(): Promise<IMessagePassingProtocol> {
 		constructor() {
 			this._terminating = false;
 			protocol.onMessage((msg) => {
+				console.log("isMessageOfType")
 				if (isMessageOfType(msg, MessageType.Terminate)) {
+				console.log("isMessageOfType::terminate");
 					this._terminating = true;
 					onTerminate();
 				} else {
+					console.log("isMessageOfType::not terminate");
 					this._onMessage.fire(msg);
 				}
 			});
@@ -205,10 +208,14 @@ async function createExtHostProtocol(): Promise<IMessagePassingProtocol> {
 }
 
 function connectToRenderer(protocol: IMessagePassingProtocol): Promise<IRendererConnection> {
+	console.error("connectToRenderer - 1");
 	return new Promise<IRendererConnection>((c) => {
 
+		console.error("connectToRenderer - waiting for init...");
 		// Listen init data message
 		const first = protocol.onMessage(raw => {
+			console.error("connectToRenderer - got init");
+			console.error("raw:")
 			first.dispose();
 
 			const initData = <IInitData>JSON.parse(raw.toString());
@@ -257,6 +264,8 @@ function connectToRenderer(protocol: IMessagePassingProtocol): Promise<IRenderer
 			});
 
 			// Kill oneself if one's parent dies. Much drama.
+			// TODO: Bring this back
+			/*
 			setInterval(function () {
 				try {
 					process.kill(initData.parentPid, 0); // throws an exception if the main process doesn't exist anymore.
@@ -264,18 +273,19 @@ function connectToRenderer(protocol: IMessagePassingProtocol): Promise<IRenderer
 					onTerminate();
 				}
 			}, 1000);
+			*/
 
 			// In certain cases, the event loop can become busy and never yield
 			// e.g. while-true or process.nextTick endless loops
 			// So also use the native node module to do it from a separate thread
-			let watchdog: typeof nativeWatchdog;
+			/*let watchdog: typeof nativeWatchdog;
 			try {
 				watchdog = require.__$__nodeRequire('native-watchdog');
 				watchdog.start(initData.parentPid);
 			} catch (err) {
 				// no problem...
 				onUnexpectedError(err);
-			}
+			}*/
 
 			// Tell the outside that we are initialized
 			protocol.send(createMessageOfType(MessageType.Initialized));
@@ -290,7 +300,9 @@ function connectToRenderer(protocol: IMessagePassingProtocol): Promise<IRenderer
 
 export async function startExtensionHostProcess(): Promise<void> {
 
+	console.error("Creating ext host protocol...")
 	const protocol = await createExtHostProtocol();
+	console.error("Created!")
 	const renderer = await connectToRenderer(protocol);
 	const { initData } = renderer;
 	// setup things
@@ -316,6 +328,7 @@ export async function startExtensionHostProcess(): Promise<void> {
 			console.error(e);
 		}
 	}
+	console.error("startExtensionHostProcess - before ext host main");
 
 	const extensionHostMain = new ExtensionHostMain(
 		renderer.protocol,
@@ -324,6 +337,11 @@ export async function startExtensionHostProcess(): Promise<void> {
 		uriTransformer
 	);
 
+	console.error("Finished creating main!");
+
 	// rewrite onTerminate-function to be a proper shutdown
-	onTerminate = () => extensionHostMain.terminate();
+	onTerminate = () => {
+		console.error("Terminating...");
+		extensionHostMain.terminate();
+	};
 }
