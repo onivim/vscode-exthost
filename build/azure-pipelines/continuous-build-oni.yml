@@ -12,23 +12,9 @@ steps:
 - powershell: |
     yarn
   displayName: Install Dependencies
-- script: |
-    yarn strict-null-check
-  displayName: Run Strict Null Checks
 - powershell: |
     yarn compile
   displayName: Compile Sources
-- powershell: |
-    yarn install
-  workingDirectory: $(Build.SourcesDirectory)/test_extensions/oni-lsp-extension
-  displayName: LSP Extension Install
-- powershell: |
-    yarn compile
-  workingDirectory: $(Build.SourcesDirectory)/test_extensions/oni-lsp-extension
-  displayName: LSP Extension Build
-- powershell: |
-    yarn test:oni
-  displayName: Run Integration Tests for Onivim 2
 - powershell: |
     yarn package:oni
   displayName: Package vscode-exthost for Onivim 2
