@@ -1,10 +1,7 @@
 steps:
 - task: NodeTool@0
   inputs:
-    versionSpec: "12.x"
-- powershell: |
-    npm install -g jest@24.5.0
-  displayName: Install jest
+    versionSpec: "12.13.0"
 - task: UsePythonVersion@0
   inputs:
     versionSpec: '2.x'
