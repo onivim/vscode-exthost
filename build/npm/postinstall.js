@@ -31,11 +31,11 @@ function yarnInstall(location, opts) {
 	}
 }
 
-yarnInstall('extensions'); // node modules shared by all extensions
-
-yarnInstall('remote'); // node modules used by vscode server
-
-yarnInstall('remote/web'); // node modules used by vscode web
+// ONIVIM:START
+//yarnInstall('extensions'); // node modules shared by all extensions
+//yarnInstall('remote'); // node modules used by vscode server
+//yarnInstall('remote/web'); // node modules used by vscode web
+// ONIVIM:END
 
 const allExtensionFolders = fs.readdirSync('extensions');
 const extensions = allExtensionFolders.filter(e => {
