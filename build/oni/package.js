@@ -40,5 +40,7 @@ const pathsToRemove = [
 ];
 
 pathsToRemove.forEach((p) => {
-	rimraf.sync(path.join(publishDir, p));
+	const pathToRemove = path.join(packageOutDir, p);
+	console.log("Remove path: " + pathToRemove);
+	rimraf.sync(pathToRemove);
 });
