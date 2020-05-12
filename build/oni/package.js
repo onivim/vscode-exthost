@@ -29,3 +29,18 @@ fs.copySync(srcPackageJson, destPackageJson);
 
 console.log(`Copying ${srcProductJson} to ${destProductJson}`);
 fs.copySync(srcProductJson, destProductJson);
+
+const pathsToRemove = [
+	"**/*.css",
+	"**/*.js.map",
+	"vs/workbench/test",
+	"vs/editor/test",
+	"vs/base/test",
+	"vs/code/test",
+];
+
+pathsToRemove.forEach((p) => {
+	const pathToRemove = path.join(packageOutDir, p);
+	console.log("Remove path: " + pathToRemove);
+	rimraf.sync(pathToRemove);
+});
