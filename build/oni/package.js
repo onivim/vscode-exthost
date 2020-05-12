@@ -33,7 +33,8 @@ fs.copySync(srcProductJson, destProductJson);
 const pathsToRemove = [
 	"**/*.css",
 	"**/*.js.map",
-	"vs/workbench/test",
+	"vs/base/test",
+	"vs/code/test",
 	"vs/editor/contrib/suggest/test",
 	"vs/editor/contrib/documentSymbols/test",
 	"vs/editor/contrib/folding/test",
@@ -42,8 +43,6 @@ const pathsToRemove = [
 	"vs/editor/contrib/snippet/test",
 	"vs/editor/standalone/test",
 	"vs/editor/test",
-	"vs/base/test",
-	"vs/code/test",
 	"vs/platform/keybinding/test",
 	"vs/platform/configuration/test",
 	"vs/platform/markers/test",
@@ -83,6 +82,7 @@ const pathsToRemove = [
 	"vs/workbench/services/progress/test",
 	"vs/workbench/services/search/test",
 	"vs/workbench/services/textfile/test",
+	"vs/workbench/test",
 ];
 
 pathsToRemove.forEach((p) => {
