@@ -15,6 +15,9 @@ const _rimraf = require("rimraf");
 const git = require("./git");
 const VinylFile = require("vinyl");
 const root = path.dirname(path.dirname(__dirname));
+// ONIVIM:START
+// Use root to suppress compilation warning:
+console.log(root);
 const NoCancellationToken = { isCancellationRequested: () => false };
 function incremental(streamProvider, initial, supportsCancellation) {
     const input = es.through();
@@ -257,8 +260,11 @@ function streamToPromise(stream) {
 }
 exports.streamToPromise = streamToPromise;
 function getElectronVersion() {
-    const yarnrc = fs.readFileSync(path.join(root, '.yarnrc'), 'utf8');
-    const target = /^target "(.*)"$/m.exec(yarnrc)[1];
-    return target;
+    // ONIVIM:START
+    return "9.9.9";
+    // ONIVIM:END
+    //	const yarnrc = fs.readFileSync(path.join(root, '.yarnrc'), 'utf8');
+    //	const target = /^target "(.*)"$/m.exec(yarnrc)![1];
+    //	return target;
 }
 exports.getElectronVersion = getElectronVersion;

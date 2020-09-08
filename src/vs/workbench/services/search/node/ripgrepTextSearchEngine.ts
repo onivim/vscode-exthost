@@ -10,7 +10,10 @@ import { StringDecoder } from 'string_decoder';
 import { createRegExp, startsWith, startsWithUTF8BOM, stripUTF8BOM, escapeRegExpCharacters, endsWith } from 'vs/base/common/strings';
 import { URI } from 'vs/base/common/uri';
 import { IExtendedExtensionSearchOptions, SearchError, SearchErrorCode, serializeSearchError } from 'vs/workbench/services/search/common/search';
-import { rgPath } from 'vscode-ripgrep';
+// ONIVIM:START
+//import { rgPath } from 'vscode-ripgrep';
+const rgPath = "";
+// ONIVIM:END
 import { anchorGlob, createTextSearchResult, IOutputChannel, Maybe } from './ripgrepSearchUtils';
 import { coalesce } from 'vs/base/common/arrays';
 import { splitGlobAware } from 'vs/base/common/glob';
