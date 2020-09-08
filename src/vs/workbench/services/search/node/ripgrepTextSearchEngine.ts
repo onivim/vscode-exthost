@@ -16,7 +16,10 @@ import { URI } from 'vs/base/common/uri';
 import { Progress } from 'vs/platform/progress/common/progress';
 import { IExtendedExtensionSearchOptions, SearchError, SearchErrorCode, serializeSearchError } from 'vs/workbench/services/search/common/search';
 import { Range, TextSearchComplete, TextSearchContext, TextSearchMatch, TextSearchOptions, TextSearchPreviewOptions, TextSearchQuery, TextSearchResult } from 'vs/workbench/services/search/common/searchExtTypes';
-import { rgPath } from 'vscode-ripgrep';
+// ONIVIM:START
+//import { rgPath } from 'vscode-ripgrep';
+const rgPath = "";
+// ONIVIM:END
 import { anchorGlob, createTextSearchResult, IOutputChannel, Maybe } from './ripgrepSearchUtils';
 
 // If vscode-ripgrep is in an .asar file, then the binary is unpacked.

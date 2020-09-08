@@ -20,6 +20,11 @@ import * as sm from 'source-map';
 
 const root = path.dirname(path.dirname(__dirname));
 
+// ONIVIM:START
+// Use root to suppress compilation warning:
+console.log(root);
+// ONIVIM:END
+
 export interface ICancellationToken {
 	isCancellationRequested(): boolean;
 }
@@ -322,7 +327,10 @@ export function streamToPromise(stream: NodeJS.ReadWriteStream): Promise<void> {
 }
 
 export function getElectronVersion(): string {
-	const yarnrc = fs.readFileSync(path.join(root, '.yarnrc'), 'utf8');
-	const target = /^target "(.*)"$/m.exec(yarnrc)![1];
-	return target;
+	// ONIVIM:START
+	return "9.9.9";
+	// ONIVIM:END
+//	const yarnrc = fs.readFileSync(path.join(root, '.yarnrc'), 'utf8');
+//	const target = /^target "(.*)"$/m.exec(yarnrc)![1];
+//	return target;
 }
