@@ -162,6 +162,13 @@ const copyrightHeaderLines = [
 	' *--------------------------------------------------------------------------------------------*/',
 ];
 
+const outrunHeaderLines = [
+	'/*---------------------------------------------------------------------------------------------',
+	' *  Copyright (c) Outrun Labs, LLC. All rights reserved.',
+	' *  Licensed under the MIT License. See License.txt in the project root for license information.',
+	' *--------------------------------------------------------------------------------------------*/',
+];
+
 function hygiene(some) {
 	let errorCount = 0;
 
@@ -202,8 +209,8 @@ function hygiene(some) {
 		const lines = file.__lines;
 
 		for (let i = 0; i < copyrightHeaderLines.length; i++) {
-			if (lines[i] !== copyrightHeaderLines[i]) {
-				console.error(file.relative + ': Missing or bad copyright statement');
+			if (lines[i] !== copyrightHeaderLines[i] && lines[i] != outrunHeaderLines[i]) {
+				console.error(file.relative + ': Missing or bad copyright statement (' + i.toString() + ')');
 				errorCount++;
 				break;
 			}
