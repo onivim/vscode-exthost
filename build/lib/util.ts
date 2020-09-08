@@ -322,7 +322,10 @@ export function streamToPromise(stream: NodeJS.ReadWriteStream): Promise<void> {
 }
 
 export function getElectronVersion(): string {
-	const yarnrc = fs.readFileSync(path.join(root, '.yarnrc'), 'utf8');
-	const target = /^target "(.*)"$/m.exec(yarnrc)![1];
-	return target;
+	// ONIVIM:START
+	return "9.9.9";
+	// ONIVIM:END
+//	const yarnrc = fs.readFileSync(path.join(root, '.yarnrc'), 'utf8');
+//	const target = /^target "(.*)"$/m.exec(yarnrc)![1];
+//	return target;
 }

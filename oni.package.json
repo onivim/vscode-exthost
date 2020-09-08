@@ -1,0 +1,31 @@
+{
+	"name": "@onivim/vscode-exthost",
+	"version": "1.45.6",
+	"distro": "df7748995d690f8d2022d96c367ead3d686833ff",
+	"author": {
+		"name": "Outrun Labs, LLC"
+	},
+	"main": "./out/main",
+	"scripts": {
+		"test": "mocha",
+		"test:oni": "jest __tests__"
+	},
+	"dependencies": {
+		"graceful-fs": "4.2.3",
+		"iconv-lite": "0.5.0",
+    "semver-umd": "^5.5.5",
+    "node-pty": "^0.10.0-beta2",
+    "spdlog": "^0.11.1",
+    "native-watchdog": "1.3.0",
+		"minimist": "^1.2.5",
+		"vscode-proxy-agent": "^0.5.2"
+	},
+	"devDependencies": {},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/onivim/vscode.git"
+	},
+	"bugs": {
+		"url": "https://github.com/onivim/vscode/issues"
+	}
+}
