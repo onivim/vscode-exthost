@@ -20,6 +20,11 @@ import * as sm from 'source-map';
 
 const root = path.dirname(path.dirname(__dirname));
 
+// ONIVIM:START
+// Use root to suppress compilation warning:
+console.log(root);
+// ONIVIM:END
+
 export interface ICancellationToken {
 	isCancellationRequested(): boolean;
 }
