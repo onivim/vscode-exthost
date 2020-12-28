@@ -10,14 +10,19 @@ const mkdirp = require("mkdirp");
 const fs = require("fs-extra");
 
 const rootDir = path.join(__dirname, "..", "..");
-const publishDir = path.join(rootDir, "_package_extensions");
+
+let publishDir = path.join(rootDir, "_package_extensions");
+if (process.argv.length > 2) {
+	publishDir = path.join(process.argv[2], "extensions");
+} else {
+	console.log(`Removing existing publish directory: ${publishDir}..`);
+	rimraf.sync(publishDir);
+
+	console.log(`Creating new publish directory: ${publishDir}...`);
+	mkdirp.sync(publishDir);
+}
+
 const extensionsDir = path.join(rootDir, "extensions");
-
-console.log(`Removing existing publish directory: ${publishDir}..`);
-rimraf.sync(publishDir);
-
-console.log(`Creating new publish directory: ${publishDir}...`);
-mkdirp.sync(publishDir);
 
 const extensionsToInclude = [
 	"bat",
@@ -89,6 +94,8 @@ const pathsToRemove = [
 	"**/node_modules",
 	"css/test",
 	"cpp/test",
+	"git/test",
+	"git/out/test",
 	"typescript-basics/test",
 ];
 
@@ -114,6 +121,10 @@ const extensionWithDependencies = [
 extensionsToInclude.forEach(extension => {
 	const extensionPath = path.join(extensionsDir, extension);
 	const outPath = path.join(publishDir, extension);
+	if (fs.existsSync(outPath)) {
+		console.log(`Deleting existing path: ${outPath}`)
+		rimraf.sync(outPath);
+	}
 	console.log(`Copying ${extensionPath} to ${outPath}...`)
 	fs.copySync(extensionPath, outPath);
 })
