@@ -50,7 +50,8 @@
     "terser": "4.3.8",
     "typescript": "^4.2.0-dev.20201119",
     "vsce": "1.48.0",
-    "xml2js": "^0.4.17"
+    "xml2js": "^0.4.17",
+    "package-merge": "0.1.2"
   },
   "scripts": {
     "compile": "tsc -p tsconfig.build.json",
