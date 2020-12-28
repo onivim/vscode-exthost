@@ -1,0 +1,10 @@
+{
+	"name": "onivim2-bundled-extensions",
+	"private": true,
+	"dependencies": {
+		"typescript": "^4.2.0-dev.20201119",
+		"typescript-formatter": "7.1.0"
+	},
+	"devDependencies": {},
+	"resolutions": {}
+}
