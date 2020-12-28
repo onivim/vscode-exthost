@@ -56,6 +56,8 @@ const extensionsToInclude = [
 	"markdown-basics",
 	"markdown-language-features",
 	"merge-conflict",
+	// TODO: Needs testing
+	// "npm", 
 	"objective-c",
 	"perl",
 	"php",
