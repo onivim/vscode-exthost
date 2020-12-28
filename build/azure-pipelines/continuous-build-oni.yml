@@ -9,5 +9,8 @@ steps:
     yarn compile
   displayName: Compile Sources
 - powershell: |
-    yarn package:oni
+    yarn package:oni:exthost
   displayName: Package vscode-exthost for Onivim 2
+- powershell: |
+    yarn package:oni:extensions
+  displayName: Package built-in extensions for Onivim 2
