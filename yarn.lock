@@ -628,11 +628,6 @@ agent-base@4:
   dependencies:
     es6-promisify "^5.0.0"
 
-agent-base@5:
-  version "5.1.1"
-  resolved "https://registry.yarnpkg.com/agent-base/-/agent-base-5.1.1.tgz#e8fb3f242959db44d63be665db7a8e739537a32c"
-  integrity sha512-TMeqbNl2fMW0nMjTEPOwe3J/PRFP4vqeoNuQMG0HlMrtm5QxKqdvAkZ1pRBQ/ulIyDD5Yq0nJ7YbdD8ey0TO3g==
-
 agent-base@6:
   version "6.0.1"
   resolved "https://registry.yarnpkg.com/agent-base/-/agent-base-6.0.1.tgz#808007e4e5867decb0ab6ab2f928fbdb5a596db4"
@@ -4716,14 +4711,6 @@ https-proxy-agent@^2.2.3:
   dependencies:
     agent-base "^4.3.0"
     debug "^3.1.0"
-
-https-proxy-agent@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/https-proxy-agent/-/https-proxy-agent-4.0.0.tgz#702b71fb5520a132a66de1f67541d9e62154d82b"
-  integrity sha512-zoDhWrkR3of1l9QAL8/scJZyLu8j/gBkcwcaQOZh7Gyh/+uJQzGVETdgT30akuwkpL8HTRfssqI3BZuV18teDg==
-  dependencies:
-    agent-base "5"
-    debug "4"
 
 https-proxy-agent@^5.0.0:
   version "5.0.0"
@@ -10062,14 +10049,6 @@ vscode-regexpp@^3.1.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/vscode-regexpp/-/vscode-regexpp-3.1.0.tgz#42d059b6fffe99bd42939c0d013f632f0cad823f"
   integrity sha512-pqtN65VC1jRLawfluX4Y80MMG0DHJydWhe5ZwMHewZD6sys4LbU6lHwFAHxeuaVE6Y6+xZOtAw+9hvq7/0ejkg==
-
-vscode-ripgrep@^1.11.1:
-  version "1.11.1"
-  resolved "https://registry.yarnpkg.com/vscode-ripgrep/-/vscode-ripgrep-1.11.1.tgz#9fa3c0a96c2939d5a2389f71218bd1bb6eaa8679"
-  integrity sha512-oHJfpqeXuTQhOO+szqIObYOddwQ9o+lzd4PQLlTQN+sQ7ex8D1qqFip207O2iJyFc5oWE8Bekf4YHTibdbW66w==
-  dependencies:
-    https-proxy-agent "^4.0.0"
-    proxy-from-env "^1.1.0"
 
 vscode-sqlite3@4.0.10:
   version "4.0.10"
