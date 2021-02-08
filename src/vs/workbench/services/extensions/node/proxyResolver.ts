@@ -385,7 +385,33 @@ function patches(originals: typeof http | typeof https, resolveProxy: ReturnType
 				return original(options, callback);
 			}
 
-			return original.apply(null, arguments as any);
+			// ONIVIM:START
+			// In Onivim, since we are running from the node context, the [agent-base] package is overriding
+			// the https.request module. We're essentially hitting the same issue as:
+			// https://github.com/microsoft/vscode/issues/93167
+
+			// To workaround this, we'll modify the call to always use the 2-param overload, just like above:
+			if (url) {
+				const parsed = typeof url === 'string' ? new nodeurl.URL(url) : url;
+				const urlOptions = {
+					protocol: parsed.protocol,
+					hostname: parsed.hostname.lastIndexOf('[', 0) === 0 ? parsed.hostname.slice(1, -1) : parsed.hostname,
+					port: parsed.port,
+					path: `${parsed.pathname}${parsed.search}`
+				};
+				if (parsed.username || parsed.password) {
+					options.auth = `${parsed.username}:${parsed.password}`;
+				}
+				options = { ...urlOptions, ...options };
+			} else {
+				options = { ...options };
+			}
+
+			return original(options, callback);
+
+			// return original.apply(null, arguments as any);
+			// ONIVIM:END
+
 		}
 		return patched;
 	}
