@@ -12,11 +12,15 @@ performance.mark('code/fork/start');
 const bootstrap = require('./bootstrap');
 const bootstrapNode = require('./bootstrap-node');
 
+// ONIVIM:START
 // Remove global paths from the node module lookup
-bootstrapNode.removeGlobalNodeModuleLookupPaths();
+//bootstrapNode.removeGlobalNodeModuleLookupPaths();
+// ONIVIM:END
 
+// ONIVIM:START
 // Enable ASAR in our forked processes
-bootstrap.enableASARSupport(undefined, false);
+// bootstrap.enableASARSupport(undefined, false);
+// ONIVIM:END
 
 if (process.env['VSCODE_INJECT_NODE_MODULE_LOOKUP_PATH']) {
 	bootstrapNode.injectNodeModuleLookupPath(process.env['VSCODE_INJECT_NODE_MODULE_LOOKUP_PATH']);
