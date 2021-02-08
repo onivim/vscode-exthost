@@ -1,0 +1,13 @@
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: "12.13.0"
+- powershell: |
+    yarn
+  displayName: Install Dependencies
+- powershell: |
+    yarn compile
+  displayName: Compile Sources
+- powershell: |
+    yarn package:oni
+  displayName: Package vscode-exthost for Onivim 2
